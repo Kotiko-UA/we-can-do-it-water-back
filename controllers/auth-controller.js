@@ -29,18 +29,17 @@ const signup = async (req, res) => {
     verificationToken,
   });
 
-  const verifyEmail = {
-    to: email,
-    subject: "Verify email",
-    html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click ferify email</a>`,
-  };
-  await sendEmail(verifyEmail);
+  // const verifyEmail = {
+  //   to: email,
+  //   subject: "Verify email",
+  //   html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click ferify email</a>`,
+  // };
+  // await sendEmail(verifyEmail);
 
-  res.status(201).json({
-    email: newUser.email,
-    subscription: newUser.subscription,
-    avatarURL,
-  });
+  // res.status(201).json({
+  //   email: newUser.email,
+  //   avatarURL,
+  // });
 };
 const verify = async (req, res) => {
   const { verificationToken } = req.params;
@@ -57,26 +56,25 @@ const verify = async (req, res) => {
   });
 };
 
-const resendVerify = async (req, res) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
+// const resendVerify = async (req, res) => {
+//   const { email } = req.body;
+//   const user = await User.findOne({ email });
 
-  if (!user) {
-    throw HttpError(401, "Email not found");
-  }
-  if (user.verify) {
-    throw HttpError(400, "Verification has already been passed");
-  }
-  const verifyEmail = {
-    to: email,
-    subject: "Verify email",
-    html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${user.verificationToken}">Click ferify email</a>`,
-  };
-  await sendEmail(verifyEmail);
-  res.json({
-    message: "Email send success",
-  });
-};
+//   if (!user) {
+//     throw HttpError(401, "Email not found");
+//   }
+//   if (user.verify) {
+//     throw HttpError(400, "Verification has already been passed");
+//   }
+//   const verifyEmail = {
+//     to: email,
+//     subject: "Verify email",
+//     html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${user.verificationToken}">Click ferify email</a>`,
+//   };
+//   await sendEmail(verifyEmail);
+//   res.json({
+//     message: "Email send success",
+//   });
 
 const signin = async (req, res) => {
   const { email, password } = req.body;
@@ -102,7 +100,7 @@ const signin = async (req, res) => {
   await User.findByIdAndUpdate(user._id, { token });
   res.json({
     token,
-    user: { email: user.email, subscription: user.subscription },
+    user: { email: user.email },
   });
 };
 

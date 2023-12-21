@@ -10,7 +10,7 @@ import { validaterBody } from "../../decorators/index.js";
 import {
   userSigninSchema,
   userSignupSchema,
-  updateSubscriptionSchema,
+  // updateSubscriptionSchema,
   userEmailSchema,
 } from "../../models/User.js";
 
@@ -18,7 +18,7 @@ const authRouter = express.Router();
 
 authRouter.post(
   "/register",
-  upload.single("avatar"),
+  // upload.single("avatar"),
   isEmptyBody,
   validaterBody(userSignupSchema),
   authController.signup
