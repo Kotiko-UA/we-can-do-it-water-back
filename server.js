@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
-// import app from './app.js';
+import app from './app.js';
 const { DB_HOST } = process.env;
 
 mongoose
   .connect(DB_HOST)
   .then(() => {
-    // app.listen(8000, () => {
-    console.log('Database connection successful');
-    // });
+    app.listen(8000, () => {
+      console.log('Database connection successful');
+    });
   })
   .catch((error) => {
     console.log(error.message);
