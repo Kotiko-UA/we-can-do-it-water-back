@@ -14,19 +14,29 @@ const avatarsPath = path.resolve("public", "avatars");
 const { JWT_SECRET, BASE_URL } = process.env;
 
 const signup = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, repeatPassword } = req.body;
+
   const avatarURL = gravatar.url(email, { s: "100", r: "x", d: "retro" }, true);
+  if (password !== repeatPassword) {
+    throw HttpError(401, "Email or password is wrong");
+  }
   const user = await User.findOne({ email });
   if (user) {
     throw HttpError(409, "Email in use");
   }
+
   const hashPassword = await bcrypt.hash(password, 10);
   const verificationToken = nanoid();
   const newUser = await User.create({
-    ...req.body,
+    email,
+    // ...req.body,
     avatarURL,
     password: hashPassword,
     verificationToken,
+  });
+  res.status(201).json({
+    email: newUser.email,
+    avatarURL,
   });
 
   const verifyEmail = {
@@ -38,7 +48,6 @@ const signup = async (req, res) => {
 
   res.status(201).json({
     email: newUser.email,
-    subscription: newUser.subscription,
     avatarURL,
   });
 };
@@ -102,15 +111,15 @@ const signin = async (req, res) => {
   await User.findByIdAndUpdate(user._id, { token });
   res.json({
     token,
-    user: { email: user.email, subscription: user.subscription },
+    user: { email: user.email },
   });
 };
 
 const getCurrent = async (req, res) => {
-  const { email, subscription } = req.user;
+  const { email, avatarURL } = req.user;
   res.json({
     email,
-    subscription,
+    avatarURL,
   });
 };
 
@@ -119,11 +128,46 @@ const logout = async (req, res) => {
   await User.findByIdAndUpdate(_id, { token: "" });
   res.status(204).json({});
 };
-const updateSubscription = async (req, res) => {
-  const { _id } = req.user;
-  await User.findByIdAndUpdate(_id, { subscription: req.body.subscription });
-  res.json({ message: "Subscription was updated" });
+
+const settings = async (req, res, next) => {
+  try {
+    const { _id, password } = req.user;
+    const { gender, newPassword, repeatPassword, outDatedPassword, email } =
+      req.body;
+
+    const passwordCompare = await bcrypt.compare(
+      outDatedPassword,
+      user.password
+    );
+
+    if (!passwordCompare && newPassword !== repeatNewPassword) {
+      throw HttpError(401, "Email or password is wrong");
+    } else if (newPassword !== null) {
+      const hashNewPassword = await bcrypt.hash(newPassword, 10);
+    }
+
+    // const { contactId } = req.params;
+    // console.log(req.params);
+    // const { error } = User.userSettingsSchema.validate(req.body);
+    // if (error) {
+    //   throw HttpErr(404, error.message);
+    // }
+
+    const result = await User.findOneAndUpdate({ _id }, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(201).json(result);
+  } catch (error) {
+    next(error);
+  }
 };
+
+// const updateSubscription = async (req, res) => {
+//   const { _id } = req.user;
+//   await User.findByIdAndUpdate(_id, { subscription: req.body.subscription });
+//   res.json({ message: "Subscription was updated" });
+// };
 
 const updateAvatar = async (req, res) => {
   if (!req.file) {
@@ -153,6 +197,7 @@ export default {
   signin: ctrlWrapper(signin),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
-  updateSubscription: ctrlWrapper(updateSubscription),
+  settings,
+  // updateSubscription: ctrlWrapper(updateSubscription),
   updateAvatar: ctrlWrapper(updateAvatar),
 };

@@ -10,7 +10,8 @@ import { validaterBody } from "../../decorators/index.js";
 import {
   userSigninSchema,
   userSignupSchema,
-  updateSubscriptionSchema,
+  userSettingsSchema,
+  // updateSubscriptionSchema,
   userEmailSchema,
 } from "../../models/User.js";
 
@@ -18,7 +19,7 @@ const authRouter = express.Router();
 
 authRouter.post(
   "/register",
-  upload.single("avatar"),
+  // upload.single("avatar"),
   isEmptyBody,
   validaterBody(userSignupSchema),
   authController.signup
@@ -44,11 +45,19 @@ authRouter.get("/current", authenticate, authController.getCurrent);
 authRouter.post("/logout", authenticate, authController.logout);
 
 authRouter.patch(
-  "/subscription",
+  "/settings",
   authenticate,
-  validaterBody(updateSubscriptionSchema),
-  authController.updateSubscription
+
+  validaterBody(userSettingsSchema),
+  authController.settings
 );
+
+// authRouter.patch(
+//   "/subscription",
+//   authenticate,
+//   validaterBody(updateSubscriptionSchema),
+//   authController.updateSubscription
+// );
 authRouter.patch(
   "/avatars",
   authenticate,
