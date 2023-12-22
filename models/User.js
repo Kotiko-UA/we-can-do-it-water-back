@@ -50,10 +50,10 @@ userShema.post("findOneAndUpdate", handleSaveError);
 
 export const userSignupSchema = Joi.object({
   password: Joi.string().required().min(6),
+  repeatPassword: Joi.string().required().min(6),
   email: Joi.string().pattern(emailRegexp).required().messages({
     "any.required": `missing required name field`,
   }),
-  // repeat password:Joi.string().required().min(6),
 });
 
 export const userSigninSchema = Joi.object({

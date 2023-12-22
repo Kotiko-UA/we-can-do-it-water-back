@@ -43,12 +43,12 @@ authRouter.get("/current", authenticate, authController.getCurrent);
 
 authRouter.post("/logout", authenticate, authController.logout);
 
-authRouter.patch(
-  "/subscription",
-  authenticate,
-  validaterBody(updateSubscriptionSchema),
-  authController.updateSubscription
-);
+// authRouter.patch(
+//   "/subscription",
+//   authenticate,
+//   validaterBody(updateSubscriptionSchema),
+//   authController.updateSubscription
+// );
 authRouter.patch(
   "/avatars",
   authenticate,
