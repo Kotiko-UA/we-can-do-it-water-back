@@ -15,6 +15,7 @@ const { JWT_SECRET, BASE_URL } = process.env;
 
 const signup = async (req, res) => {
   const { email, password, repeatPassword } = req.body;
+
   const avatarURL = gravatar.url(email, { s: "100", r: "x", d: "retro" }, true);
   if (password !== repeatPassword) {
     throw HttpError(401, "Email or password is wrong");
@@ -27,10 +28,15 @@ const signup = async (req, res) => {
   const hashPassword = await bcrypt.hash(password, 10);
   const verificationToken = nanoid();
   const newUser = await User.create({
-    ...req.body,
+    email,
+    // ...req.body,
     avatarURL,
     password: hashPassword,
     verificationToken,
+  });
+  res.status(201).json({
+    email: newUser.email,
+    avatarURL,
   });
 
   const verifyEmail = {
@@ -122,6 +128,41 @@ const logout = async (req, res) => {
   await User.findByIdAndUpdate(_id, { token: "" });
   res.status(204).json({});
 };
+
+const settings = async (req, res, next) => {
+  try {
+    const { _id, password } = req.user;
+    const { gender, newPassword, repeatPassword, outDatedPassword, email } =
+      req.body;
+
+    const passwordCompare = await bcrypt.compare(
+      outDatedPassword,
+      user.password
+    );
+
+    if (!passwordCompare && newPassword !== repeatNewPassword) {
+      throw HttpError(401, "Email or password is wrong");
+    } else if (newPassword !== null) {
+      const hashNewPassword = await bcrypt.hash(newPassword, 10);
+    }
+
+    // const { contactId } = req.params;
+    // console.log(req.params);
+    // const { error } = User.userSettingsSchema.validate(req.body);
+    // if (error) {
+    //   throw HttpErr(404, error.message);
+    // }
+
+    const result = await User.findOneAndUpdate({ _id }, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(201).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // const updateSubscription = async (req, res) => {
 //   const { _id } = req.user;
 //   await User.findByIdAndUpdate(_id, { subscription: req.body.subscription });
@@ -156,6 +197,7 @@ export default {
   signin: ctrlWrapper(signin),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
-  updateSubscription: ctrlWrapper(updateSubscription),
+  settings,
+  // updateSubscription: ctrlWrapper(updateSubscription),
   updateAvatar: ctrlWrapper(updateAvatar),
 };

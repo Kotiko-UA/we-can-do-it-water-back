@@ -49,11 +49,11 @@ userShema.pre("findOneAndUpdate", preUpdate);
 userShema.post("findOneAndUpdate", handleSaveError);
 
 export const userSignupSchema = Joi.object({
-  password: Joi.string().required().min(6),
-  repeatPassword: Joi.string().required().min(6),
   email: Joi.string().pattern(emailRegexp).required().messages({
     "any.required": `missing required name field`,
   }),
+  password: Joi.string().required().min(6),
+  repeatPassword: Joi.string().required().min(6),
 });
 
 export const userSigninSchema = Joi.object({
@@ -71,6 +71,14 @@ export const userEmailSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).required().messages({
     "any.required": `missing required name field`,
   }),
+});
+export const userSettingsSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp).messages({
+    "any.required": `missing required name field`,
+  }),
+  password: Joi.string().min(6),
+  gender: Joi.string().valid("girl", "men"),
+  avatarURL: Joi.string(),
 });
 
 const User = model("user", userShema);

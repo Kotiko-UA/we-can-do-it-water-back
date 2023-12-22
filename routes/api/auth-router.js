@@ -10,6 +10,7 @@ import { validaterBody } from "../../decorators/index.js";
 import {
   userSigninSchema,
   userSignupSchema,
+  userSettingsSchema,
   // updateSubscriptionSchema,
   userEmailSchema,
 } from "../../models/User.js";
@@ -42,6 +43,14 @@ authRouter.post(
 authRouter.get("/current", authenticate, authController.getCurrent);
 
 authRouter.post("/logout", authenticate, authController.logout);
+
+authRouter.patch(
+  "/settings",
+  authenticate,
+
+  validaterBody(userSettingsSchema),
+  authController.settings
+);
 
 // authRouter.patch(
 //   "/subscription",
