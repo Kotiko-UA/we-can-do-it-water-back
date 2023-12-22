@@ -14,20 +14,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
-app.get("/", (req, res) => {
-  res.send(
-    `<h1>Home page</h1><a href="/">Home</a> <a href="/waterNotes">waterNotes</a>`
-  );
-});
-app.get("/waterNotes", (req, res) => {
-  res.send(
-    `<h1>waterNotes</h1>
-    <a href="/">Home</a> <a href="/waterNotes">waterNotes</a>
-    <div><img src="/avatars/1701561126762_420970656}_Screenshot from 2023-08-18 17-58-21.png"></div>
-    `
-  );
-});
-
 app.use("/api/waterNotes", waterNotesRouter);
 
 app.use("/api/users", authRouter);

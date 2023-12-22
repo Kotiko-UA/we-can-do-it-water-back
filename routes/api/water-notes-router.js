@@ -6,11 +6,7 @@ import {
   authenticate,
 } from "../../middlewares/index.js";
 import { validaterBody } from "../../decorators/index.js";
-import {
-  waterNoteAddSchema,
-  waterNoteUpdateSchema,
-  waterNoteFavoriteSchema,
-} from "../../models/WaterNote.js";
+import { waterNoteAddUpdateSchema } from "../../models/WaterNote.js";
 
 const waterNotesRouter = express.Router();
 
@@ -18,12 +14,10 @@ waterNotesRouter.use(authenticate);
 
 waterNotesRouter.get("/", waterNotesController.getAll);
 
-waterNotesRouter.get("/:id", isValidId, waterNotesController.getById);
-
 waterNotesRouter.post(
   "/",
   isEmptyBody,
-  validaterBody(waterNoteAddSchema),
+  validaterBody(waterNoteAddUpdateSchema),
   waterNotesController.add
 );
 
@@ -31,17 +25,10 @@ waterNotesRouter.put(
   "/:id",
   isValidId,
   isEmptyBody,
-  validaterBody(waterNoteUpdateSchema),
+  validaterBody(waterNoteAddUpdateSchema),
   waterNotesController.updateById
 );
 
-waterNotesRouter.patch(
-  "/:id/favorite",
-  isValidId,
-  isEmptyBody,
-  validaterBody(waterNoteFavoriteSchema),
-  waterNotesController.updateById
-);
 waterNotesRouter.delete("/:id", isValidId, waterNotesController.deleteById);
 
 export default waterNotesRouter;
