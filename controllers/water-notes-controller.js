@@ -2,6 +2,21 @@ import WaterNote from "../models/WaterNote.js";
 import { HttpError } from "../helpers/index.js";
 import { ctrlWrapper } from "../decorators/index.js";
 
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 const daysInMonth = (y, mon) => {
   let month = Number(mon);
   let year = Number(y);
@@ -16,7 +31,7 @@ const daysInMonth = (y, mon) => {
   return Math.round((date2 - date1) / 1000 / 3600 / 24);
 };
 
-const getAll = async (req, res) => {
+const getByMonth = async (req, res) => {
   const { _id: owner } = req.user;
   const date = new Date();
   const {
@@ -24,17 +39,57 @@ const getAll = async (req, res) => {
     year = date.getUTCFullYear(),
     ...filterParams
   } = req.query;
-  const filter = { owner, ...filterParams };
-  const result = await WaterNote.find({
+  const consumptions = await WaterNote.find({
     owner,
     createdAt: {
       $gte: new Date(year, month - 1, 1),
       $lt: new Date(year, month - 1, daysInMonth(year, month), 23, 59, 59),
     },
   });
+
+  const monthData = [];
+  for (let day = 1; day <= daysInMonth(year, month); day++) {
+    const mon = month > 9 ? month : `0${month}`;
+    const consums = [...consumptions].filter(({ createdAt }) => {
+      return createdAt
+        .toISOString()
+        .includes(`${year}-${mon}-${String(day).padStart(2, "0")}`);
+    });
+    const date = `${day}, ${months[month - 1]}`;
+    const procent =
+      consums.reduce(
+        (acc, curr) => acc + Math.round((curr.amount / curr.norma) * 100),
+        0
+      ) + "%";
+    const servings = consums.length;
+    const norma =
+      servings > 0 ? (consums[0].norma / 1000).toFixed(1) + " L" : "2.0 L";
+    monthData.push({
+      date,
+      norma,
+      procent,
+      servings,
+    });
+  }
+
+  res.json(monthData);
+};
+const getOnToday = async (req, res) => {
+  const { _id: owner } = req.user;
+  const date = new Date();
+  const month = date.getUTCMonth();
+  const year = date.getUTCFullYear();
+  const day = date.getDate();
+
+  const result = await WaterNote.find({
+    owner,
+    createdAt: {
+      $gte: new Date(year, month, day),
+      $lt: new Date(year, month, day, 23, 59, 59),
+    },
+  });
   res.json(result);
 };
-
 const getById = async (req, res) => {
   const { id } = req.params;
   const { _id: owner } = req.user;
@@ -76,7 +131,8 @@ const deleteById = async (req, res) => {
 };
 
 export default {
-  getAll: ctrlWrapper(getAll),
+  getByMonth: ctrlWrapper(getByMonth),
+  getOnToday: ctrlWrapper(getOnToday),
   getById: ctrlWrapper(getById),
   add: ctrlWrapper(add),
   updateById: ctrlWrapper(updateById),
