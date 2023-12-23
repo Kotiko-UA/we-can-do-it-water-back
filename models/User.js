@@ -57,20 +57,25 @@ export const userSignupSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).required().messages({
     "any.required": `missing required name field`,
   }),
-  password: Joi.string().required().min(6),
-  repeatPassword: Joi.string().required().min(6),
+  password: Joi.string().required().min(6).messages({
+    "string.empty": `"Password" cannot be an empty field`,
+    "any.required": `"Password" is a required field`,
+  }),
+  repeatPassword: Joi.string().required().min(6).messages({
+    "string.empty": `"RepeatPassword" cannot be an empty field`,
+    "any.required": `"RepeatPassword" is a required field`,
+  }),
 });
 
 export const userSigninSchema = Joi.object({
-  password: Joi.string().required().min(6),
+  password: Joi.string().required().min(6).messages({
+    "string.empty": `"Password" cannot be an empty field`,
+    "any.required": `"Password" is a required field`,
+  }),
   email: Joi.string().pattern(emailRegexp).required().messages({
     "any.required": `missing required name field`,
   }),
 });
-
-// export const updateGenderSchema = Joi.object({
-//   gender: Joi.string().required().valid("girl", "men"),
-// });
 
 export const userEmailSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).required().messages({

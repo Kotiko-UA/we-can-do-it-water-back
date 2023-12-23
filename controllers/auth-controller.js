@@ -28,7 +28,7 @@ const signup = async (req, res) => {
   const verificationToken = nanoid();
   const newUser = await User.create({
     email,
-    // ...req.body,
+    name: `User_${Date.now()}`,
     avatarURL,
     password: hashPassword,
     verificationToken,
@@ -36,6 +36,7 @@ const signup = async (req, res) => {
   res.status(201).json({
     email: newUser.email,
     avatarURL,
+    name: newUser.name,
   });
 
   const verifyEmail = {
@@ -115,11 +116,8 @@ const signin = async (req, res) => {
 };
 
 const getCurrent = async (req, res) => {
-  const { email, avatarURL } = req.user;
-  res.json({
-    email,
-    avatarURL,
-  });
+  const { email, avatarURL, _id, name, gender } = req.user;
+  res.json({ email, avatarURL, _id, name, gender });
 };
 
 const logout = async (req, res) => {
@@ -127,10 +125,12 @@ const logout = async (req, res) => {
   await User.findByIdAndUpdate(_id, { token: "" });
   res.status(204).json({});
 };
+
 const settings = async (req, res) => {
   const { email } = req.user;
   const { newPassword } = req.body;
   let { password } = req.user;
+
   // const { error } = User.userSettingsSchema.validate(req.body);
   // if (error) {
   //   throw HttpError(404, error.message);
@@ -152,12 +152,6 @@ const settings = async (req, res) => {
   );
   res.json(result);
 };
-
-// const updateSubscription = async (req, res) => {
-//   const { _id } = req.user;
-//   await User.findByIdAndUpdate(_id, { subscription: req.body.subscription });
-//   res.json({ message: "Subscription was updated" });
-// };
 
 const updateAvatar = async (req, res) => {
   console.log(req.file);
@@ -183,6 +177,6 @@ export default {
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
   settings: ctrlWrapper(settings),
-  // updateSubscription: ctrlWrapper(updateSubscription),
+
   updateAvatar: ctrlWrapper(updateAvatar),
 };
