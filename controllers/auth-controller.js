@@ -8,8 +8,7 @@ import path from "path";
 import gravatar from "gravatar";
 import Jimp from "jimp";
 import { nanoid } from "nanoid";
-
-const avatarsPath = path.resolve("public", "avatars");
+import cloudinary from "../helpers/cloudinary.js";
 
 const { JWT_SECRET, BASE_URL } = process.env;
 
@@ -128,39 +127,30 @@ const logout = async (req, res) => {
   await User.findByIdAndUpdate(_id, { token: "" });
   res.status(204).json({});
 };
+const settings = async (req, res) => {
+  const { email } = req.user;
+  const { newPassword } = req.body;
+  let { password } = req.user;
+  // const { error } = User.userSettingsSchema.validate(req.body);
+  // if (error) {
+  //   throw HttpError(404, error.message);
+  // }
+  if (email === req.body.email) {
+    throw HttpError(401, "Email in use");
+  }
 
-const settings = async (req, res, next) => {
-  try {
-    const { _id, password } = req.user;
-    const { gender, newPassword, repeatPassword, outDatedPassword, email } =
-      req.body;
+  password = newPassword ? await bcrypt.hash(password, 10) : password;
+  console.log(password);
 
-    const passwordCompare = await bcrypt.compare(
-      outDatedPassword,
-      user.password
-    );
-
-    if (!passwordCompare && newPassword !== repeatNewPassword) {
-      throw HttpError(401, "Email or password is wrong");
-    } else if (newPassword !== null) {
-      const hashNewPassword = await bcrypt.hash(newPassword, 10);
-    }
-
-    // const { contactId } = req.params;
-    // console.log(req.params);
-    // const { error } = User.userSettingsSchema.validate(req.body);
-    // if (error) {
-    //   throw HttpErr(404, error.message);
-    // }
-
-    const result = await User.findOneAndUpdate({ _id }, req.body, {
+  const result = await User.findOneAndUpdate(
+    req.user._id,
+    { ...req.body, password },
+    {
       new: true,
       runValidators: true,
-    });
-    res.status(201).json(result);
-  } catch (error) {
-    next(error);
-  }
+    }
+  );
+  res.json(result);
 };
 
 // const updateSubscription = async (req, res) => {
@@ -170,20 +160,14 @@ const settings = async (req, res, next) => {
 // };
 
 const updateAvatar = async (req, res) => {
+  console.log(req.file);
+
   if (!req.file) {
     throw HttpError(400, "No file");
   }
-  const { path: oldPath, filename } = req.file;
-  const newPath = path.join(avatarsPath, filename);
-  //await fs.rename(oldPath, newPath);
-
-  Jimp.read(oldPath, (err, avatar) => {
-    if (err) throw err;
-    avatar.resize(250, 250).quality(60).write(newPath);
+  const { url: avatarURL } = await cloudinary.uploader.upload(req.file.path, {
+    folder: "avarars",
   });
-  await fs.unlink(oldPath);
-
-  const avatarURL = path.join("avatars", filename);
   await User.findByIdAndUpdate(req.user._id, {
     avatarURL,
   });
@@ -197,7 +181,7 @@ export default {
   signin: ctrlWrapper(signin),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
-  settings,
+  settings: ctrlWrapper(settings),
   // updateSubscription: ctrlWrapper(updateSubscription),
   updateAvatar: ctrlWrapper(updateAvatar),
 };

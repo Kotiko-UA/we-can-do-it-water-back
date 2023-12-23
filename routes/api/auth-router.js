@@ -47,7 +47,6 @@ authRouter.post("/logout", authenticate, authController.logout);
 authRouter.patch(
   "/settings",
   authenticate,
-
   validaterBody(userSettingsSchema),
   authController.settings
 );
