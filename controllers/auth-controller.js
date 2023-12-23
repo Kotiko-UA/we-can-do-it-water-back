@@ -168,6 +168,7 @@ const updateAvatar = async (req, res) => {
   const { url: avatarURL } = await cloudinary.uploader.upload(req.file.path, {
     folder: "avarars",
   });
+  fs.unlink(req.file.path);
   await User.findByIdAndUpdate(req.user._id, {
     avatarURL,
   });
