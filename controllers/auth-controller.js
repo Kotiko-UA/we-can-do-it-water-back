@@ -166,7 +166,7 @@ const updateAvatar = async (req, res) => {
     throw HttpError(400, "No file");
   }
   const { url: avatarURL } = await cloudinary.uploader.upload(req.file.path, {
-    folder: "avarars",
+    folder: "avatars",
   });
   fs.unlink(req.file.path);
   await User.findByIdAndUpdate(req.user._id, {
