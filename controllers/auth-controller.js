@@ -139,7 +139,7 @@ const settings = async (req, res) => {
     throw HttpError(401, "Email in use");
   }
 
-  password = newPassword ? await bcrypt.hash(password, 10) : password;
+  password = newPassword ? await bcrypt.hash(newPassword, 10) : password;
   console.log(password);
 
   const result = await User.findOneAndUpdate(
