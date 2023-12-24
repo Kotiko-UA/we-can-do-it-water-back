@@ -8,25 +8,35 @@ import path from "path";
 import gravatar from "gravatar";
 import Jimp from "jimp";
 import { nanoid } from "nanoid";
-
-const avatarsPath = path.resolve("public", "avatars");
+import cloudinary from "../helpers/cloudinary.js";
 
 const { JWT_SECRET, BASE_URL } = process.env;
 
 const signup = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, repeatPassword } = req.body;
+
   const avatarURL = gravatar.url(email, { s: "100", r: "x", d: "retro" }, true);
+  if (password !== repeatPassword) {
+    throw HttpError(401, "Email or password is wrong");
+  }
   const user = await User.findOne({ email });
   if (user) {
     throw HttpError(409, "Email in use");
   }
+
   const hashPassword = await bcrypt.hash(password, 10);
   const verificationToken = nanoid();
   const newUser = await User.create({
-    ...req.body,
+    email,
+    name: `User_${Date.now()}`,
     avatarURL,
     password: hashPassword,
     verificationToken,
+  });
+  res.status(201).json({
+    email: newUser.email,
+    avatarURL,
+    name: newUser.name,
   });
 
   const verifyEmail = {
@@ -38,7 +48,6 @@ const signup = async (req, res) => {
 
   res.status(201).json({
     email: newUser.email,
-    subscription: newUser.subscription,
     avatarURL,
   });
 };
@@ -102,16 +111,13 @@ const signin = async (req, res) => {
   await User.findByIdAndUpdate(user._id, { token });
   res.json({
     token,
-    user: { email: user.email, subscription: user.subscription },
+    user: { email: user.email },
   });
 };
 
 const getCurrent = async (req, res) => {
-  const { email, subscription } = req.user;
-  res.json({
-    email,
-    subscription,
-  });
+  const { email, avatarURL, _id, name, gender } = req.user;
+  res.json({ email, avatarURL, _id, name, gender });
 };
 
 const logout = async (req, res) => {
@@ -119,27 +125,44 @@ const logout = async (req, res) => {
   await User.findByIdAndUpdate(_id, { token: "" });
   res.status(204).json({});
 };
-const updateSubscription = async (req, res) => {
-  const { _id } = req.user;
-  await User.findByIdAndUpdate(_id, { subscription: req.body.subscription });
-  res.json({ message: "Subscription was updated" });
+
+const settings = async (req, res) => {
+  const { email } = req.user;
+  const { newPassword } = req.body;
+  let { password } = req.user;
+
+  // const { error } = User.userSettingsSchema.validate(req.body);
+  // if (error) {
+  //   throw HttpError(404, error.message);
+  // }
+  if (email === req.body.email) {
+    throw HttpError(401, "Email in use");
+  }
+
+  password = newPassword ? await bcrypt.hash(newPassword, 10) : password;
+  console.log(password);
+
+  const result = await User.findOneAndUpdate(
+    req.user._id,
+    { ...req.body, password },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  res.json(result);
 };
 
 const updateAvatar = async (req, res) => {
+  console.log(req.file);
+
   if (!req.file) {
     throw HttpError(400, "No file");
   }
-  const { path: oldPath, filename } = req.file;
-  const newPath = path.join(avatarsPath, filename);
-  //await fs.rename(oldPath, newPath);
-
-  Jimp.read(oldPath, (err, avatar) => {
-    if (err) throw err;
-    avatar.resize(250, 250).quality(60).write(newPath);
+  const { url: avatarURL } = await cloudinary.uploader.upload(req.file.path, {
+    folder: "avatars",
   });
-  await fs.unlink(oldPath);
-
-  const avatarURL = path.join("avatars", filename);
+  fs.unlink(req.file.path);
   await User.findByIdAndUpdate(req.user._id, {
     avatarURL,
   });
@@ -153,6 +176,7 @@ export default {
   signin: ctrlWrapper(signin),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
-  updateSubscription: ctrlWrapper(updateSubscription),
+  settings: ctrlWrapper(settings),
+
   updateAvatar: ctrlWrapper(updateAvatar),
 };

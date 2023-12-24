@@ -2,37 +2,26 @@ import { Schema, model } from "mongoose";
 import { handleSaveError, preUpdate } from "./hooks.js";
 import Joi from "joi";
 
-const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-const nameRegexp = /^([a-zA-Z]|\s)*$/;
-const phoneRegexp = /^(\()?\d{3}(\))?(-|\s)?\d{3}(-|\s)\d{4}$/;
-
 const waterNoteShema = new Schema(
   {
-    name: {
-      type: String,
-      match: nameRegexp,
-      required: [true, "missing required name field`"],
+    amount: {
+      type: Number,
+      min: [50, "Too few water"],
+      max: [5000, "Too many water"],
+      required: [true, "missing required amount field`"],
     },
-    email: {
+    time: {
       type: String,
-      match: [emailRegexp, "Please fill a valid email address"],
-      required: [true, "missing required email field`"],
+      required: [true, "missing required time field`"],
     },
-    phone: {
-      type: String,
-      validate: {
-        validator: function (v) {
-          return phoneRegexp.test(v);
-        },
-        message: (props) => `${props.value} is not a valid phone number!`,
-      },
-      required: [true, "missing required phone field`"],
+    norma: {
+      type: Number,
+      min: [50, "Too few water"],
+      max: [15000, "Too many water"],
+
+      required: [true, "missing required norma field`"],
     },
 
-    favorite: {
-      type: Boolean,
-      default: false,
-    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
@@ -48,37 +37,17 @@ waterNoteShema.pre("findOneAndUpdate", preUpdate);
 
 waterNoteShema.post("findOneAndUpdate", handleSaveError);
 
-export const waterNoteAddSchema = Joi.object({
-  name: Joi.string().min(2).max(20).pattern(nameRegexp).required().messages({
-    "string.base": '"Name" should be a type of "text"',
-    "any.required": `missing required name field`,
-    "string.pattern.base": '"Name" must contains only latters',
+export const waterNoteAddUpdateSchema = Joi.object({
+  amount: Joi.number().min(50).max(5000).required().messages({
+    "number.base": '"Amount" should be a type of "number"',
+    "any.required": `missing required amount field`,
   }),
-  email: Joi.string().pattern(emailRegexp).required().messages({
-    "any.required": `missing required name field`,
+  time: Joi.string().required().messages({
+    "any.required": `missing required time field`,
   }),
-  phone: Joi.string().pattern(phoneRegexp).required().messages({
-    "any.required": `missing required phone field`,
-    "string.pattern.base": '"Phone" must be like (111) 111-1111',
-  }),
-  favorite: Joi.boolean(),
-});
-
-export const waterNoteUpdateSchema = Joi.object({
-  name: Joi.string().min(2).max(20).pattern(nameRegexp).messages({
-    "string.base": '"Name" should be a type of "text"',
-    "string.pattern.base": '"Name" must contains only latters',
-  }),
-  email: Joi.string().pattern(emailRegexp),
-  phone: Joi.string().pattern(phoneRegexp).messages({
-    "string.pattern.base": '"Phone" must be like (111) 111-1111',
-  }),
-  favorite: Joi.boolean(),
-});
-
-export const waterNoteFavoriteSchema = Joi.object({
-  favorite: Joi.boolean().required().messages({
-    "any.required": `missing field favorite`,
+  norma: Joi.number().required().messages({
+    "any.required": `missing required norma field`,
+    "number.base": '"Norma" should be a type of "number"',
   }),
 });
 
