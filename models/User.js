@@ -13,7 +13,7 @@ export const userShema = new Schema(
     password: {
       type: String,
       required: [true, "Set password for user"],
-      minLength: 6,
+      minLength: 8,
     },
 
     email: {
@@ -57,18 +57,18 @@ export const userSignupSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).required().messages({
     "any.required": `missing required name field`,
   }),
-  password: Joi.string().required().min(6).messages({
+  password: Joi.string().required().min(8).messages({
     "string.empty": `"Password" cannot be an empty field`,
     "any.required": `"Password" is a required field`,
   }),
-  repeatPassword: Joi.string().required().min(6).messages({
+  repeatPassword: Joi.string().required().min(8).messages({
     "string.empty": `"RepeatPassword" cannot be an empty field`,
     "any.required": `"RepeatPassword" is a required field`,
   }),
 });
 
 export const userSigninSchema = Joi.object({
-  password: Joi.string().required().min(6).messages({
+  password: Joi.string().required().min(8).messages({
     "string.empty": `"Password" cannot be an empty field`,
     "any.required": `"Password" is a required field`,
   }),
@@ -87,7 +87,7 @@ export const userSettingsSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).messages({
     "any.required": `missing required name field`,
   }),
-  newPassword: Joi.string().min(6),
+  newPassword: Joi.string().min(8),
   gender: Joi.string().valid("girl", "men"),
   avatar: Joi.string(),
 });
