@@ -169,6 +169,44 @@ const updateAvatar = async (req, res) => {
   res.json({ avatarURL });
 };
 
+const forgetPassword = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  console.log(user);
+  if (!user) {
+    throw HttpError("409", "User not registered");
+  }
+  const recoveryPasswordMail = {
+    to: email,
+    subject: "Recovery password",
+
+    html: `<a href="${BASE_URL}/api/users/recovery"> Click to recovery password </a>`,
+  };
+  await sendEmail(recoveryPasswordMail);
+  res.status(200).json({
+    message: "Verification email sent, check your emailBox",
+  });
+};
+
+const recovery = async (req, res, next) => {
+  const { newPassword, repeatPassword, email } = req.body;
+  console.log(req.body);
+
+  const user = await User.findOne({ email });
+  console.log(user);
+
+  if (user.email !== email || newPassword !== repeatPassword) {
+    throw HttpError("409", "Data not correct");
+  }
+  const hashpassword = await bcrypt.hash(newPassword, 10);
+
+  await User.findByIdAndUpdate(user._id, { password: hashpassword });
+
+  res.status(200).json({
+    message: "Password recovery ",
+  });
+};
+
 export default {
   signup: ctrlWrapper(signup),
   verify: ctrlWrapper(verify),
@@ -177,6 +215,7 @@ export default {
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
   settings: ctrlWrapper(settings),
-
+  forgetPassword: ctrlWrapper(forgetPassword),
+  recovery: ctrlWrapper(recovery),
   updateAvatar: ctrlWrapper(updateAvatar),
 };
