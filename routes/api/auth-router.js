@@ -49,13 +49,19 @@ authRouter.patch(
   validaterBody(userSettingsSchema),
   authController.settings
 );
+authRouter.get(
+  "/forgetpassword",
+  isEmptyBody,
+  // validateBody(userSinginSchema),
+  authController.forgetPassword
+);
+authRouter.patch(
+  "/recovery",
+  isEmptyBody,
+  // validateBody(userSinginSchema),
+  authController.recovery
+);
 
-// authRouter.patch(
-//   "/subscription",
-//   authenticate,
-//   validaterBody(updateSubscriptionSchema),
-//   authController.updateSubscription
-// );
 authRouter.patch(
   "/avatars",
   authenticate,
