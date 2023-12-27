@@ -106,12 +106,13 @@ const signin = async (req, res) => {
   const paylod = {
     id: user._id,
   };
-
+  const avatarURL = user.avatarURL;
   const token = jwt.sign(paylod, JWT_SECRET, { expiresIn: "24h" });
   await User.findByIdAndUpdate(user._id, { token });
   res.json({
     token,
     user: { email: user.email },
+    avatarURL,
   });
 };
 
