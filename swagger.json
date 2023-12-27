@@ -1,0 +1,541 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "2.0.1",
+    "title": "API documentation for project Tracker of water",
+    "description": "Трекер води є веб-додатком, який дозволяє користувачеві стежити за своїм щоденним вживанням води. ",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "servers": [{ "url": "http://localhost:8000" }],
+  "tags": [
+    {
+      "name": "User",
+      "description": "User endpoints"
+    },
+    {
+      "name": "WaterNote",
+      "description": "WaterNote endpoints"
+    }
+  ],
+  "paths": {
+    "/api/users/register": {
+      "post": {
+        "tags": ["User"],
+        "summary": "User registration",
+        "parameters": [],
+        "requestBody": {
+          "description": "Registration's object ",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": { "message": "Email in use" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "tags": ["User"],
+        "summary": "User login",
+        "parameters": [],
+        "requestBody": {
+          "description": "Login's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/api/users/verify/": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Send verify email",
+        "parameters": [],
+        "requestBody": {
+          "description": "Verify's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email send success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Email not found",
+            "content": {}
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Verification has already been passed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/users/verify/{verificationToken}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "User verificationToken",
+        "parameters": [
+          {
+            "name": "verificationToken",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationTokenResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/users/settings": {
+      "patch": {
+        "tags": ["User"],
+        "summary": "User settings",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Settings's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "response message"
+                    }
+                  },
+
+                  "example": { "message": "Email in use" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/current": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get current user info",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Logged user returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "response message"
+                    }
+                  },
+                  "example": {
+                    "message": "Authentication failed. Please log in."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RegistrationRequest": {
+        "type": "object",
+        "required": ["email", "password", "repeatPassword"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "User_1703626378604"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          },
+          "repeatPassword": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "RegistrationResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "User's name",
+              "example": "User_1703626378604"
+            },
+
+            "email": {
+              "type": "string",
+              "description": "User's email",
+              "format": "email"
+            },
+            "avatarURL": {
+              "type": "string",
+              "description": "User's avatar URL",
+              "example": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro"
+            }
+          }
+        },
+        "example": {
+          "email": "user@example.com",
+          "avatarURL": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro",
+          "name": "User_1703626378604"
+        }
+      },
+      "VerifyRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          }
+        }
+      },
+      "VerifyResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "response message"
+          }
+        },
+        "example": {
+          "message": "Email send success"
+        }
+      },
+
+      "VerificationTokenRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          }
+        }
+      },
+      "VerificationTokenResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "response message"
+          }
+        },
+        "example": {
+          "message": "Verification successful"
+        }
+      },
+
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+
+          "properties": {
+            "token": {
+              "type": "string",
+              "description": "Auth JWT Token",
+              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1OGIxOTBjYmQ0YmI4NmZmYTZkMDhmZCIsImlhdCI6MTcwMzYyMzcyOSwiZXhwIjoxNzAzNzEwMTI5fQ.BCv3G-n7eUMUhaUwFVvAzY10F29npram1P5CSy4LxDE"
+            },
+            "user": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "User's email",
+                  "format": "email"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1OGIxOTBjYmQ0YmI4NmZmYTZkMDhmZCIsImlhdCI6MTcwMzYyMzcyOSwiZXhwIjoxNzAzNzEwMTI5fQ.BCv3G-n7eUMUhaUwFVvAzY10F29npram1P5CSy4LxDE",
+          "user": {
+            "email": "user@example.com"
+          }
+        }
+      },
+      "SettingsRequest": {
+        "type": "object",
+
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "User_1703614732940"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "gender": {
+            "type": "string",
+            "description": "User's gender",
+            "enum": ["girl", "men"],
+            "default": "girl"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          },
+          "repeatPassword": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "SettingsResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "User's name",
+              "example": "User_1703614732940"
+            },
+
+            "email": {
+              "type": "string",
+              "description": "User's email",
+              "format": "email"
+            },
+            "avatarURL": {
+              "type": "string",
+              "description": "User's avatar URL",
+              "example": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro"
+            }
+          }
+        },
+        "example": {
+          "email": "user@example.com",
+          "avatarURL": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro",
+          "name": "User_1703614732940"
+        }
+      },
+      "CurrentResponse": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "avatarURL": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          },
+
+          "_id": {
+            "type": "string",
+            "description": "User's id",
+            "example": "658bf2bdf6f2ee81043f5b72"
+          },
+
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "User_1703614732940"
+          },
+          "gender": {
+            "type": "string",
+            "description": "User's gender",
+            "enum": ["girl", "men"],
+            "default": "girl"
+          }
+        },
+        "example": {
+          "email": "user@example.com",
+          "avatarURL": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro",
+          "_id": "658bf2bdf6f2ee81043f5b72",
+          "name": "User_1703670461101",
+          "gender": "girl"
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

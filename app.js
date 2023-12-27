@@ -4,15 +4,18 @@ import cors from "cors";
 import waterNotesRouter from "./routes/api/water-notes-router.js";
 import "dotenv/config";
 import authRouter from "./routes/api/auth-router.js";
+import swaggerUi from "swagger-ui-express";
+import fs from "fs";
+const swaggerDocument = JSON.parse(fs.readFileSync("./swagger.json"));
 
 const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
-
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/api/waterNotes", waterNotesRouter);
 
