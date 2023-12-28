@@ -34,11 +34,15 @@ const daysInMonth = (y, mon) => {
 const getByMonth = async (req, res) => {
   const { _id: owner } = req.user;
   const date = new Date();
-  const {
-    month = date.getUTCMonth() + 1,
-    year = date.getUTCFullYear(),
-    ...filterParams
-  } = req.query;
+  const { month = date.getUTCMonth() + 1, year = date.getUTCFullYear() } =
+    req.query;
+  if (year < 2020 || month > 2030) {
+    throw HttpError(400, `Year must be between 2020 and 2030`);
+  }
+  if (month < 1 || month > 12) {
+    throw HttpError(400, `Month must be between 1 and 12`);
+  }
+
   const consumptions = await WaterNote.find({
     owner,
     createdAt: {
@@ -97,14 +101,15 @@ const getById = async (req, res) => {
   const result = await WaterNote.findOne({ _id: id, owner });
 
   if (!result) {
-    throw HttpError(404, `WaterNote with id=${id} not found!`);
+    throw HttpError(404, `The water note with id=${id} not found!`);
   }
   res.json(result);
 };
 
 const add = async (req, res) => {
-  const { _id: owner } = req.user;
-  const result = await WaterNote.create({ ...req.body, owner });
+  const { _id: owner, dailyNorma } = req.user;
+  const norma = dailyNorma ? Number(dailyNorma) * 1000 : 2000;
+  const result = await WaterNote.create({ ...req.body, owner, norma });
   res.status(201).json(result);
 };
 
@@ -114,7 +119,7 @@ const updateById = async (req, res) => {
 
   const result = await WaterNote.findOneAndUpdate({ _id: id, owner }, req.body);
   if (!result) {
-    throw HttpError(404, `WaterNote with id=${id} not found!`);
+    throw HttpError(404, `The water note with id=${id} not found!`);
   }
   res.json(result);
 };
@@ -125,9 +130,9 @@ const deleteById = async (req, res) => {
 
   const result = await WaterNote.findOneAndDelete({ _id: id, owner });
   if (!result) {
-    throw HttpError(404, `WaterNote with id=${id} not found!`);
+    throw HttpError(404, `The water note with id=${id} not found!`);
   }
-  res.json({ message: "WaterNote deleted" });
+  res.json({ message: "The water note deleted" });
 };
 
 export default {

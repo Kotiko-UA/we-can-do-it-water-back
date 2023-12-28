@@ -1,0 +1,1058 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "2.0.1",
+    "title": "API documentation for project Tracker of water",
+    "description": "Трекер води є веб-додатком, який дозволяє користувачеві стежити за своїм щоденним вживанням води. ",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "servers": [{ "url": "http://localhost:8000" }],
+  "tags": [
+    {
+      "name": "User",
+      "description": "User endpoints"
+    },
+    {
+      "name": "WaterNote",
+      "description": "WaterNote endpoints"
+    }
+  ],
+  "paths": {
+    "/api/users/register": {
+      "post": {
+        "tags": ["User"],
+        "summary": "User registration",
+        "parameters": [],
+        "requestBody": {
+          "description": "Registration's object ",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": { "message": "Email in use" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "tags": ["User"],
+        "summary": "User login",
+        "parameters": [],
+        "requestBody": {
+          "description": "Login's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/api/users/verify": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Send verify email",
+        "parameters": [],
+        "requestBody": {
+          "description": "Verify's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email send success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+
+          "404": {
+            "description": "Email not found",
+            "content": {}
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Verification has already been passed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/users/verify/{verificationToken}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "User verificationToken",
+        "parameters": [
+          {
+            "name": "verificationToken",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationTokenResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/users/settings": {
+      "patch": {
+        "tags": ["User"],
+        "summary": "User settings update",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Settings's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "response message"
+                    }
+                  },
+
+                  "example": { "message": "Email in use" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/current": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get current user info",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Logged user returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/logout": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Signs out user",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "204": {
+            "description": "User signed out - успішний вихід з системи",
+            "content": {}
+          },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/avatars": {
+      "patch": {
+        "tags": ["User"],
+        "summary": "Upload user avatar",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Avatar file",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AvatarsRequest"
+              }
+            }
+          }
+        },
+
+        "responses": {
+          "200": {
+            "description": "User's avatar URL",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/forgetpassword": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Request to get email for password recovery",
+        "parameters": [],
+        "requestBody": {
+          "description": "Object with email for recovery",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email send success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgotPasswordResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+
+          "404": {
+            "description": "Email not found",
+            "content": {}
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Verification has already been passed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/waterNotes": {
+      "get": {
+        "tags": ["WaterNote"],
+        "summary": "Get the water notes by month of year for logged in user",
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "type": "string",
+            "format": "string",
+            "description": "Month for getting data, by default - current month",
+            "example": "12"
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "type": "string",
+            "format": "string",
+            "description": "Year for getting data, by default - current month",
+            "example": "2023"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "The water notes by month of year",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaterNotesByMonthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["WaterNote"],
+        "summary": "Add the water note to the base",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Add the water note object ",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddUpdateWaterNoteRequest"
+              }
+            }
+          }
+        },
+
+        "responses": {
+          "201": {
+            "description": "The water note created to the base",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddUpdateWaterNoteRequest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/waterNotes/today": {
+      "get": {
+        "tags": ["WaterNote"],
+        "summary": "Get the water notes on today for logged in user",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "The water notes on today",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaterNotesOnTodayResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/waterNotes/{id}": {
+      "put": {
+        "tags": ["WaterNote"],
+        "summary": "Updating the water note",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Updating the water note object ",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddUpdateWaterNoteRequest"
+              }
+            }
+          }
+        },
+
+        "responses": {
+          "200": {
+            "description": "Updated water note",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddUpdateWaterNoteResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": " The water note not found!",
+            "content": {}
+          }
+        }
+      },
+      "delete": {
+        "tags": ["WaterNote"],
+        "summary": "Updating the water note",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "The water note deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddUpdateWaterNoteResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": " The water note not found!",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+      "RegistrationRequest": {
+        "type": "object",
+        "required": ["email", "password", "repeatPassword"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "User_1703626378604"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          },
+          "repeatPassword": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "RegistrationResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "User_1703626378604"
+          },
+
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "avatarURL": {
+            "type": "string",
+            "description": "User's avatar URL",
+            "example": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro"
+          }
+        },
+        "example": {
+          "email": "user@example.com",
+          "avatarURL": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro",
+          "name": "User_1703626378604"
+        }
+      },
+      "VerifyRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          }
+        }
+      },
+      "VerifyResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "response message"
+          }
+        },
+        "example": {
+          "message": "Email send success"
+        }
+      },
+
+      "VerificationTokenRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          }
+        }
+      },
+      "VerificationTokenResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "response message"
+          }
+        },
+        "example": {
+          "message": "Verification successful"
+        }
+      },
+
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Auth JWT Token",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1OGIxOTBjYmQ0YmI4NmZmYTZkMDhmZCIsImlhdCI6MTcwMzYyMzcyOSwiZXhwIjoxNzAzNzEwMTI5fQ.BCv3G-n7eUMUhaUwFVvAzY10F29npram1P5CSy4LxDE"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              }
+            }
+          }
+        },
+        "example": {
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1OGIxOTBjYmQ0YmI4NmZmYTZkMDhmZCIsImlhdCI6MTcwMzYyMzcyOSwiZXhwIjoxNzAzNzEwMTI5fQ.BCv3G-n7eUMUhaUwFVvAzY10F29npram1P5CSy4LxDE",
+          "user": {
+            "email": "user@example.com"
+          }
+        }
+      },
+      "SettingsRequest": {
+        "type": "object",
+        "required": ["password"],
+
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "User_1703614732940"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "gender": {
+            "type": "string",
+            "description": "User's gender",
+            "enum": ["girl", "men"],
+            "default": "girl"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "User's new password",
+            "example": "123qwerty"
+          },
+
+          "repeatNewPassword": {
+            "type": "string",
+            "description": "Repeat user's new password",
+            "example": "123qwerty"
+          }
+        }
+      },
+      "SettingsResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "response message"
+          }
+        },
+        "example": {
+          "message": "User saved successfully"
+        }
+      },
+      "CurrentResponse": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "avatarURL": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          },
+
+          "_id": {
+            "type": "string",
+            "description": "User's id",
+            "example": "658bf2bdf6f2ee81043f5b72"
+          },
+
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "User_1703614732940"
+          },
+          "gender": {
+            "type": "string",
+            "description": "User's gender",
+            "enum": ["girl", "men"],
+            "default": "girl"
+          }
+        },
+        "example": {
+          "email": "user@example.com",
+          "avatarURL": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro",
+          "_id": "658bf2bdf6f2ee81043f5b72",
+          "name": "User_1703670461101",
+          "gender": "girl"
+        }
+      },
+      "AvatarsRequest": {
+        "type": "object",
+        "required": ["avatar"],
+        "properties": {
+          "avatar": {
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "AvatarsResponse": {
+        "type": "object",
+        "properties": {
+          "avatarURL": {
+            "type": "string",
+            "description": "User's avatar URL"
+          }
+        },
+        "example": {
+          "avatarURL": "http://res.cloudinary.com/dwvqwgluc/image/upload/v1703718970/avatars/un0ikbqelunwoywbduis.jpg"
+        }
+      },
+      "ForgotPasswordRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          }
+        }
+      },
+      "ForgotPasswordResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "response message"
+          }
+        },
+        "example": {
+          "message": "Verification email sent, check your emailBox"
+        }
+      },
+      "WaterNotesByMonthResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "date": {
+              "type": "string",
+              "description": "Day of the month",
+              "example": "12, December"
+            },
+            "norma": {
+              "type": "string",
+              "description": "User's daily norma",
+              "example": "2.0 L"
+            },
+            "procent": {
+              "type": "string",
+              "description": "Procent of the user's drinked water of daily norma",
+              "example": "10%"
+            },
+            "servings": {
+              "type": "integer",
+              "description": "Quantity of the servings drinked water on this day",
+              "example": 5
+            }
+          }
+        }
+      },
+      "WaterNotesOnTodayResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string",
+              "description": "ID of the water note",
+              "example": "6586a9d03496604d7fa67ba1"
+            },
+            "amount": {
+              "type": "integer",
+              "description": "Amount of the water serving",
+              "example": 500
+            },
+            "time": {
+              "type": "string",
+              "description": "The time when the serving was drinked",
+              "example": "7:00 AM"
+            },
+
+            "norma": {
+              "type": "integer",
+              "description": "User's daily norma",
+              "example": 1500
+            },
+            "owner": {
+              "type": "string",
+              "description": "ID of the user",
+              "example": "6585828fef9a0b4e149c85c7"
+            },
+
+            "createdAt": {
+              "type": "string",
+              "description": "The date when the note was created",
+              "example": "2023-12-23T09:35:12.526Z"
+            },
+            "updatedAt": {
+              "type": "string",
+              "description": "The date when the note was updated",
+              "example": "2023-12-23T09:35:12.526Z"
+            }
+          }
+        }
+      },
+      "AddUpdateWaterNoteRequest": {
+        "type": "object",
+        "required": ["amount", "time"],
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "description": "Amount of the water serving",
+            "example": 300
+          },
+          "time": {
+            "type": "string",
+            "description": "The time when the serving was drinked",
+            "example": "11:00 AM"
+          }
+        }
+      },
+      "AddUpdateWaterNoteResponse": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "description": "Amount of the water serving",
+            "example": 500
+          },
+          "time": {
+            "type": "string",
+            "description": "The time when the serving was drinked",
+            "example": "7:00 AM"
+          },
+
+          "norma": {
+            "type": "integer",
+            "description": "User's daily norma",
+            "example": 1500
+          },
+          "owner": {
+            "type": "string",
+            "description": "ID of the user",
+            "example": "6585828fef9a0b4e149c85c7"
+          },
+          "_id": {
+            "type": "string",
+            "description": "ID of the water note",
+            "example": "6586a9d03496604d7fa67ba1"
+          },
+
+          "createdAt": {
+            "type": "string",
+            "description": "The date when the note was created",
+            "example": "2023-12-23T09:35:12.526Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "The date when the note was updated",
+            "example": "2023-12-23T09:35:12.526Z"
+          }
+        }
+      },
+      "DeleteWaterNoteByIdResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "response message"
+          }
+        },
+        "example": {
+          "message": "WaterNote deleted"
+        }
+      },
+
+      "error401UnathorizedResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "response message"
+          }
+        },
+        "example": {
+          "message": "Authentication failed. Please log in."
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
