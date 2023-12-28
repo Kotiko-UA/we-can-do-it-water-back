@@ -11,7 +11,7 @@ import {
   userSigninSchema,
   userSignupSchema,
   userSettingsSchema,
-  // updateSubscriptionSchema,
+  userDailyNormaUpdateSchema,
   userEmailSchema,
 } from "../../models/User.js";
 
@@ -49,10 +49,16 @@ authRouter.patch(
   validaterBody(userSettingsSchema),
   authController.settings
 );
-authRouter.get(
+authRouter.patch(
+  "/updateDailyNorma",
+  authenticate,
+  validaterBody(userDailyNormaUpdateSchema),
+  authController.dailyNormaUpdate
+);
+authRouter.post(
   "/forgetpassword",
   isEmptyBody,
-  // validateBody(userSinginSchema),
+  validaterBody(userEmailSchema),
   authController.forgetPassword
 );
 authRouter.patch(
