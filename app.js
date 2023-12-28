@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(express.static("public"));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use("/api/waterNotes", waterNotesRouter);
+app.use("/api/waternotes", waterNotesRouter);
 
 app.use("/api/users", authRouter);
 
