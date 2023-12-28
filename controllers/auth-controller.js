@@ -71,10 +71,10 @@ const resendVerify = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw HttpError(401, "Email not found");
+    throw HttpError(404, "Email not found");
   }
   if (user.verify) {
-    throw HttpError(400, "Verification has already been passed");
+    throw HttpError(409, "Verification has already been passed");
   }
   const verifyEmail = {
     to: email,
@@ -125,6 +125,19 @@ const logout = async (req, res) => {
   const { _id } = req.user;
   await User.findByIdAndUpdate(_id, { token: "" });
   res.status(204).json({});
+};
+
+const dailyNormaUpdate = async (req, res) => {
+  const { _id } = req.user;
+  const { dailyNorma } = req.body;
+
+  if (!dailyNorma) {
+    throw HttpError(401, "Enter your dailyNorma");
+  }
+  await User.findByIdAndUpdate(_id, req.body);
+  res.json({
+    dailyNorma,
+  });
 };
 
 const settings = async (req, res) => {
@@ -181,7 +194,7 @@ const forgetPassword = async (req, res) => {
     to: email,
     subject: "Recovery password",
 
-    html: `<a href="${BASE_URL}/api/users/recovery"> Click to recovery password </a>`,
+    html: `<a href="http://localhost:3000/we-can-do-it-water-front/recovery"> Click to recovery password </a>`,
   };
   await sendEmail(recoveryPasswordMail);
   res.status(200).json({
@@ -219,4 +232,5 @@ export default {
   forgetPassword: ctrlWrapper(forgetPassword),
   recovery: ctrlWrapper(recovery),
   updateAvatar: ctrlWrapper(updateAvatar),
+  dailyNormaUpdate: ctrlWrapper(dailyNormaUpdate),
 };
