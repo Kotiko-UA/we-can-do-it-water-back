@@ -105,7 +105,7 @@
         }
       }
     },
-    "/api/users/verify/": {
+    "/api/users/verify": {
       "post": {
         "tags": ["User"],
         "summary": "Send verify email",
@@ -337,7 +337,7 @@
         }
       }
     },
-    "/api/users/forgetpassword/": {
+    "/api/users/forgetpassword": {
       "post": {
         "tags": ["User"],
         "summary": "Request to get email for password recovery",
@@ -388,7 +388,7 @@
         }
       }
     },
-    "/api/waterNotes/": {
+    "/api/waterNotes": {
       "get": {
         "tags": ["WaterNote"],
         "summary": "Get the water notes by month of year for logged in user",
@@ -449,7 +449,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddWaterNoteRequest"
+                "$ref": "#/components/schemas/AddUpdateWaterNoteRequest"
               }
             }
           }
@@ -461,7 +461,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AddWaterNoteResponse"
+                  "$ref": "#/components/schemas/AddUpdateWaterNoteRequest"
                 }
               }
             }
@@ -512,8 +512,103 @@
           }
         }
       }
+    },
+    "/api/waterNotes/{id}": {
+      "put": {
+        "tags": ["WaterNote"],
+        "summary": "Updating the water note",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Updating the water note object ",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddUpdateWaterNoteRequest"
+              }
+            }
+          }
+        },
+
+        "responses": {
+          "200": {
+            "description": "Updated water note",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddUpdateWaterNoteResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": " The water note not found!",
+            "content": {}
+          }
+        }
+      },
+      "delete": {
+        "tags": ["WaterNote"],
+        "summary": "Updating the water note",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "The water note deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddUpdateWaterNoteResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": " The water note not found!",
+            "content": {}
+          }
+        }
+      }
     }
   },
+
   "components": {
     "schemas": {
       "RegistrationRequest": {
@@ -868,13 +963,14 @@
           }
         }
       },
-      "AddWaterNoteRequest": {
+      "AddUpdateWaterNoteRequest": {
         "type": "object",
+        "required": ["amount", "time"],
         "properties": {
           "amount": {
             "type": "integer",
             "description": "Amount of the water serving",
-            "example": 250
+            "example": 300
           },
           "time": {
             "type": "string",
@@ -883,7 +979,7 @@
           }
         }
       },
-      "AddWaterNoteResponse": {
+      "AddUpdateWaterNoteResponse": {
         "type": "object",
         "properties": {
           "amount": {
@@ -923,6 +1019,18 @@
             "description": "The date when the note was updated",
             "example": "2023-12-23T09:35:12.526Z"
           }
+        }
+      },
+      "DeleteWaterNoteByIdResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "response message"
+          }
+        },
+        "example": {
+          "message": "WaterNote deleted"
         }
       },
 
