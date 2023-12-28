@@ -34,11 +34,8 @@ const daysInMonth = (y, mon) => {
 const getByMonth = async (req, res) => {
   const { _id: owner } = req.user;
   const date = new Date();
-  const {
-    month = date.getUTCMonth() + 1,
-    year = date.getUTCFullYear(),
-    ...filterParams
-  } = req.query;
+  const { month = date.getUTCMonth() + 1, year = date.getUTCFullYear() } =
+    req.query;
   const consumptions = await WaterNote.find({
     owner,
     createdAt: {
@@ -103,16 +100,19 @@ const getById = async (req, res) => {
 };
 
 const add = async (req, res) => {
-  const { _id: owner } = req.user;
-  const result = await WaterNote.create({ ...req.body, owner });
+  const { _id: owner, dailyNorma: norma } = req.user;
+  const result = await WaterNote.create({ ...req.body, owner, norma });
   res.status(201).json(result);
 };
 
 const updateById = async (req, res) => {
   const { id } = req.params;
-  const { _id: owner } = req.user;
+  const { _id: owner, dailyNorma: norma } = req.user;
 
-  const result = await WaterNote.findOneAndUpdate({ _id: id, owner }, req.body);
+  const result = await WaterNote.findOneAndUpdate(
+    { _id: id, owner, norma },
+    req.body
+  );
   if (!result) {
     throw HttpError(404, `WaterNote with id=${id} not found!`);
   }

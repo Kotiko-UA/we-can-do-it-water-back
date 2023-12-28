@@ -45,10 +45,6 @@ export const waterNoteAddUpdateSchema = Joi.object({
   time: Joi.string().required().messages({
     "any.required": `missing required time field`,
   }),
-  norma: Joi.number().required().messages({
-    "any.required": `missing required norma field`,
-    "number.base": '"Norma" should be a type of "number"',
-  }),
 });
 
 const waterNote = model("waterNote", waterNoteShema);
