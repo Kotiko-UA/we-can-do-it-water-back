@@ -14,3 +14,8 @@ mongoose
     console.log(error.message);
     process.exit(1);
   });
+
+// const todoItems = days.map((day, index) => (
+//   // Делайте так, только если у элементов массива нет заданного ID
+//   <li key={"day-" + index}>{day.date}</li>
+// ));
