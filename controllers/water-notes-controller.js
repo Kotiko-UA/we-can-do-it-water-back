@@ -36,7 +36,7 @@ const getByMonth = async (req, res) => {
   const date = new Date();
   const { month = date.getUTCMonth() + 1, year = date.getUTCFullYear() } =
     req.query;
-  if (year < 2020 || month > 2030) {
+  if (year < 2020 || year > 2030) {
     throw HttpError(400, `Year must be between 2020 and 2030`);
   }
   if (month < 1 || month > 12) {
