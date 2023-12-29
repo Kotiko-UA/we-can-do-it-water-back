@@ -11,7 +11,10 @@
   },
   "consumes": ["application/json"],
   "produces": ["application/json"],
-  "servers": [{ "url": "http://localhost:8000" }],
+  "servers": [
+    { "url": "https://water-p2oh.onrender.com" },
+    { "url": "http://localhost:8000" }
+  ],
   "tags": [
     {
       "name": "User",
