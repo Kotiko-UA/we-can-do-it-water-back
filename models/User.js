@@ -91,15 +91,15 @@ export const userSettingsSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).messages({
     "any.required": `missing required name field`,
   }),
-  outdatedPasswword: Joi.string().required().min(8).messages({
+  outdatedPasswword: Joi.string().min(8).messages({
     "string.empty": `"OutdatedPasswword" cannot be an empty field`,
     "any.required": `"OutdatedPasswword" is a required field`,
   }),
-  repeatNewPassword: Joi.string().required().min(8).messages({
+  repeatNewPassword: Joi.string().min(8).messages({
     "string.empty": `"RepeatNewPassword" cannot be an empty field`,
     "any.required": `"RepeatNewPassword" is a required field`,
   }),
-  newPassword: Joi.string().required().min(8).messages({
+  newPassword: Joi.string().min(8).messages({
     "string.empty": `"NewPassword" cannot be an empty field`,
     "any.required": `"NewPassword" is a required field`,
   }),
