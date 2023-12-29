@@ -391,7 +391,7 @@
         }
       }
     },
-    "/api/waterNotes": {
+    "/api/waternotes": {
       "get": {
         "tags": ["WaterNote"],
         "summary": "Get the water notes by month of year for logged in user",
@@ -486,7 +486,7 @@
         }
       }
     },
-    "/api/waterNotes/today": {
+    "/api/waternotes/today": {
       "get": {
         "tags": ["WaterNote"],
         "summary": "Get the water notes on today for logged in user",
@@ -516,7 +516,7 @@
         }
       }
     },
-    "/api/waterNotes/{id}": {
+    "/api/waternotes/{id}": {
       "put": {
         "tags": ["WaterNote"],
         "summary": "Updating the water note",
