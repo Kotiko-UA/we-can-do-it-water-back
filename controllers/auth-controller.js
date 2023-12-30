@@ -17,7 +17,7 @@ const signup = async (req, res) => {
 
   const avatarURL = gravatar.url(email, { s: "100", r: "x", d: "retro" }, true);
   if (password !== repeatPassword) {
-    throw HttpError(401, "Email or password is wrong");
+    throw HttpError(400, "Email or password is wrong");
   }
   const user = await User.findOne({ email });
   if (user) {
@@ -117,8 +117,8 @@ const signin = async (req, res) => {
 };
 
 const getCurrent = async (req, res) => {
-  const { email, avatarURL, _id, name, gender } = req.user;
-  res.json({ email, avatarURL, _id, name, gender });
+  const { email, avatarURL, _id, name, gender, dailyNorma } = req.user;
+  res.json({ email, avatarURL, _id, name, gender, dailyNorma });
 };
 
 const logout = async (req, res) => {
@@ -132,7 +132,7 @@ const dailyNormaUpdate = async (req, res) => {
   const { dailyNorma } = req.body;
 
   if (!dailyNorma) {
-    throw HttpError(401, "Enter your dailyNorma");
+    throw HttpError(400, "Enter your dailyNorma");
   }
   await User.findByIdAndUpdate(_id, req.body);
   res.json({
@@ -149,9 +149,6 @@ const settings = async (req, res) => {
   // if (error) {
   //   throw HttpError(404, error.message);
   // }
-  if (email === req.body.email) {
-    throw HttpError(401, "Email in use");
-  }
 
   password = newPassword ? await bcrypt.hash(newPassword, 10) : password;
   console.log(password);
@@ -188,7 +185,7 @@ const forgetPassword = async (req, res) => {
   const user = await User.findOne({ email });
   console.log(user);
   if (!user) {
-    throw HttpError("409", "User not registered");
+    throw HttpError("404", "User not registered");
   }
   const recoveryPasswordMail = {
     to: email,
@@ -204,13 +201,14 @@ const forgetPassword = async (req, res) => {
 
 const recovery = async (req, res, next) => {
   const { newPassword, repeatPassword, email } = req.body;
-  console.log(req.body);
 
   const user = await User.findOne({ email });
-  console.log(user);
+  if (!user) {
+    throw HttpError(404, "Email not found");
+  }
 
   if (user.email !== email || newPassword !== repeatPassword) {
-    throw HttpError("409", "Data not correct");
+    throw HttpError("400", "Data not correct");
   }
   const hashpassword = await bcrypt.hash(newPassword, 10);
 

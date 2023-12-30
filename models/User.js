@@ -88,26 +88,20 @@ export const userEmailSchema = Joi.object({
 });
 export const userSettingsSchema = Joi.object({
   name: Joi.string().min(3),
-  email: Joi.string().pattern(emailRegexp).messages({
-    "any.required": `missing required name field`,
-  }),
-  outdatedPasswword: Joi.string().min(8).messages({
-    "string.empty": `"OutdatedPasswword" cannot be an empty field`,
-    "any.required": `"OutdatedPasswword" is a required field`,
-  }),
-  repeatNewPassword: Joi.string().min(8).messages({
-    "string.empty": `"RepeatNewPassword" cannot be an empty field`,
-    "any.required": `"RepeatNewPassword" is a required field`,
-  }),
-  newPassword: Joi.string().min(8).messages({
-    "string.empty": `"NewPassword" cannot be an empty field`,
-    "any.required": `"NewPassword" is a required field`,
-  }),
+  email: Joi.string().pattern(emailRegexp),
+
+  outdatedPasswword: Joi.string().min(8),
+
+  repeatNewPassword: Joi.string().min(8),
+
+  newPassword: Joi.string().min(8),
+
   gender: Joi.string().valid("girl", "men"),
   avatar: Joi.string(),
 });
+
 export const userDailyNormaUpdateSchema = Joi.object({
-  dailyNorma: Joi.string().required().messages({
+  dailyNorma: Joi.number().required().messages({
     "string.empty": `"DailyNorma" cannot be an empty field`,
     "any.required": `"DailyNorma" is a required field`,
   }),
