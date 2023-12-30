@@ -45,12 +45,14 @@ authRouter.post("/logout", authenticate, authController.logout);
 
 authRouter.patch(
   "/settings",
+  isEmptyBody,
   authenticate,
   validaterBody(userSettingsSchema),
   authController.settings
 );
 authRouter.patch(
   "/updateDailyNorma",
+  isEmptyBody,
   authenticate,
   validaterBody(userDailyNormaUpdateSchema),
   authController.dailyNormaUpdate
