@@ -55,7 +55,13 @@
           },
           "400": {
             "description": "Bad request (invalid request body)",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": { "message": "Email or password is wrong" }
+                }
+              }
+            }
           },
           "409": {
             "description": "Conflict",
@@ -224,6 +230,16 @@
             "description": "Bad request (invalid request body)",
             "content": {}
           },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
+                }
+              }
+            }
+          },
           "409": {
             "description": "Conflict",
             "content": {
@@ -351,7 +367,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ForgotPasswordRequest"
+                "$ref": "#/components/schemas/ForgetPasswordRequest"
               }
             }
           }
@@ -362,7 +378,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ForgotPasswordResponse"
+                  "$ref": "#/components/schemas/ForgetPasswordResponse"
                 }
               }
             }
@@ -375,15 +391,88 @@
           "404": {
             "description": "Email not found",
             "content": {}
-          },
-          "409": {
-            "description": "Conflict",
+          }
+        }
+      }
+    },
+    "/api/users/recovery": {
+      "patch": {
+        "tags": ["User"],
+        "summary": "Request to get email for password recovery",
+        "parameters": [],
+        "requestBody": {
+          "description": "Object with email for recovery",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoveryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password recovery",
             "content": {
               "application/json": {
                 "schema": {
-                  "example": {
-                    "message": "Verification has already been passed"
-                  }
+                  "$ref": "#/components/schemas/RecoveryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+
+          "404": {
+            "description": "Email not found",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/users/updateDailyNorma": {
+      "patch": {
+        "tags": ["User"],
+        "summary": "Updating the user's daily water norm",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "DailyNorm's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDailyNormaRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateDailyNormaResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
                 }
               }
             }
@@ -391,6 +480,7 @@
         }
       }
     },
+
     "/api/waternotes": {
       "get": {
         "tags": ["WaterNote"],
@@ -659,11 +749,6 @@
             "description": "User's avatar URL",
             "example": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro"
           }
-        },
-        "example": {
-          "email": "user@example.com",
-          "avatarURL": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro",
-          "name": "User_1703626378604"
         }
       },
       "VerifyRequest": {
@@ -778,7 +863,7 @@
             "enum": ["girl", "men"],
             "default": "girl"
           },
-          "password": {
+          "outdatedPasswword": {
             "type": "string",
             "description": "User's password",
             "example": "qwerty123"
@@ -838,14 +923,12 @@
             "description": "User's gender",
             "enum": ["girl", "men"],
             "default": "girl"
+          },
+          "dailyNorma": {
+            "type": "string",
+            "description": "User's daily norma",
+            "example": "1.5"
           }
-        },
-        "example": {
-          "email": "user@example.com",
-          "avatarURL": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro",
-          "_id": "658bf2bdf6f2ee81043f5b72",
-          "name": "User_1703670461101",
-          "gender": "girl"
         }
       },
       "AvatarsRequest": {
@@ -870,7 +953,7 @@
           "avatarURL": "http://res.cloudinary.com/dwvqwgluc/image/upload/v1703718970/avatars/un0ikbqelunwoywbduis.jpg"
         }
       },
-      "ForgotPasswordRequest": {
+      "ForgetPasswordRequest": {
         "type": "object",
         "required": ["email"],
         "properties": {
@@ -881,7 +964,7 @@
           }
         }
       },
-      "ForgotPasswordResponse": {
+      "ForgetPasswordResponse": {
         "type": "object",
         "properties": {
           "message": {
@@ -890,9 +973,66 @@
           }
         },
         "example": {
-          "message": "Verification email sent, check your emailBox"
+          "message": "Email for password recovery sent, check your emailBox"
         }
       },
+      "RecoveryRequest": {
+        "type": "object",
+        "required": ["email", "newPassword", "repeatPassword"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "User's new password",
+            "example": "123qwerty"
+          },
+
+          "repeatPassword": {
+            "type": "string",
+            "description": "Repeat user's new password",
+            "example": "123qwerty"
+          }
+        }
+      },
+      "RecoveryResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "response message"
+          }
+        },
+        "example": {
+          "message": "Password was recovered successfully!"
+        }
+      },
+
+      "UpdateDailyNormaRequest": {
+        "type": "object",
+        "required": ["dailyNorma"],
+        "properties": {
+          "dailyNorma": {
+            "type": "number",
+            "description": "User's daily norma",
+            "example": 1.8
+          }
+        }
+      },
+      "UpdateDailyNormaResponse": {
+        "type": "object",
+        "properties": {
+          "dailyNorma": {
+            "type": "number",
+            "description": "Updated daily water rate of the user",
+            "example": 1.7
+          }
+        }
+      },
+
       "WaterNotesByMonthResponse": {
         "type": "array",
         "items": {

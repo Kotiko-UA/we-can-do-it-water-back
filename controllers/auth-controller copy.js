@@ -149,6 +149,9 @@ const settings = async (req, res) => {
   // if (error) {
   //   throw HttpError(404, error.message);
   // }
+  // if (email === req.body.email) {
+  //   throw HttpError(401, "Email in use");
+  // }
 
   password = newPassword ? await bcrypt.hash(newPassword, 10) : password;
   console.log(password);
@@ -185,7 +188,7 @@ const forgetPassword = async (req, res) => {
   const user = await User.findOne({ email });
   console.log(user);
   if (!user) {
-    throw HttpError("404", "User not registered");
+    throw HttpError(404, "Email not found");
   }
   const recoveryPasswordMail = {
     to: email,
@@ -195,27 +198,30 @@ const forgetPassword = async (req, res) => {
   };
   await sendEmail(recoveryPasswordMail);
   res.status(200).json({
-    message: "Verification email sent, check your emailBox",
+    message: "Email for password recovery sent, check your emailBox",
   });
 };
 
 const recovery = async (req, res, next) => {
   const { newPassword, repeatPassword, email } = req.body;
+  console.log(req.body);
 
   const user = await User.findOne({ email });
   if (!user) {
     throw HttpError(404, "Email not found");
   }
 
+  console.log(user);
+
   if (user.email !== email || newPassword !== repeatPassword) {
-    throw HttpError("400", "Data not correct");
+    throw HttpError(400, "Data not correct");
   }
   const hashpassword = await bcrypt.hash(newPassword, 10);
 
   await User.findByIdAndUpdate(user._id, { password: hashpassword });
 
   res.status(200).json({
-    message: "Password recovery ",
+    message: "Password was recovered successfully!",
   });
 };
 
