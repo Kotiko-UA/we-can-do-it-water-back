@@ -194,10 +194,9 @@ const forgetPassword = async (req, res) => {
     subject: "Recovery password",
     text: `Your new password ${recoveryPassword}`,
   };
+  console.log(recoveryPasswordMail);
   await sendEmail(recoveryPasswordMail);
-  // res.status(200).json({
-  //   message: "Verification email sent, check your emailBox",
-  // });
+
   await User.findByIdAndUpdate(user._id, { password: recoveryPassword });
 
   res.status(200).json({
