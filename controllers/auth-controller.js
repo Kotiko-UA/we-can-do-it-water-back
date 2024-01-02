@@ -183,19 +183,25 @@ const updateAvatar = async (req, res) => {
 const forgetPassword = async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
-  console.log(user);
+
   if (!user) {
     throw HttpError("404", "User not registered");
   }
+  const recoveryPassword = await bcrypt.hash(nanoid(), 10);
+
   const recoveryPasswordMail = {
     to: email,
     subject: "Recovery password",
-
-    html: `<a href="http://localhost:3000/we-can-do-it-water-front/recovery"> Click to recovery password </a>`,
+    text: `Your new password ${recoveryPassword}`,
   };
   await sendEmail(recoveryPasswordMail);
+  // res.status(200).json({
+  //   message: "Verification email sent, check your emailBox",
+  // });
+  await User.findByIdAndUpdate(user._id, { password: recoveryPassword });
+
   res.status(200).json({
-    message: "Verification email sent, check your emailBox",
+    message: "Password recovery ",
   });
 };
 
