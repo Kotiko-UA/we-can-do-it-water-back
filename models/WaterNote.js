@@ -2,6 +2,7 @@ import { Schema, model } from "mongoose";
 import { handleSaveError, preUpdate } from "./hooks.js";
 import Joi from "joi";
 
+const timeRegexp = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
 const waterNoteShema = new Schema(
   {
     amount: {
@@ -42,8 +43,9 @@ export const waterNoteAddUpdateSchema = Joi.object({
     "number.base": '"Amount" should be a type of "number"',
     "any.required": `missing required amount field`,
   }),
-  time: Joi.string().required().messages({
+  time: Joi.string().required().pattern(timeRegexp).messages({
     "any.required": `missing required time field`,
+    "string.pattern.base": '"Time" must be like 22:15',
   }),
 });
 

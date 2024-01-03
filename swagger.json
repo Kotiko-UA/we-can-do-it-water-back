@@ -554,7 +554,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AddUpdateWaterNoteRequest"
+                  "$ref": "#/components/schemas/AddUpdateWaterNoteResponse"
                 }
               }
             }
@@ -1062,46 +1062,39 @@
         }
       },
       "WaterNotesOnTodayResponse": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "_id": {
-              "type": "string",
-              "description": "ID of the water note",
-              "example": "6586a9d03496604d7fa67ba1"
-            },
-            "amount": {
-              "type": "integer",
-              "description": "Amount of the water serving",
-              "example": 500
-            },
-            "time": {
-              "type": "string",
-              "description": "The time when the serving was drinked",
-              "example": "7:00 AM"
-            },
-
-            "norma": {
-              "type": "integer",
-              "description": "User's daily norma",
-              "example": 1500
-            },
-            "owner": {
-              "type": "string",
-              "description": "ID of the user",
-              "example": "6585828fef9a0b4e149c85c7"
-            },
-
-            "createdAt": {
-              "type": "string",
-              "description": "The date when the note was created",
-              "example": "2023-12-23T09:35:12.526Z"
-            },
-            "updatedAt": {
-              "type": "string",
-              "description": "The date when the note was updated",
-              "example": "2023-12-23T09:35:12.526Z"
+        "type": "object",
+        "properties": {
+          "norma": {
+            "type": "number",
+            "description": "User's daily norma",
+            "example": 1.7
+          },
+          "procent": {
+            "type": "integer",
+            "description": "Procent of the user's drinked water of daily norma",
+            "example": 75
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "ID of the water note",
+                  "example": "6586a9d03496604d7fa67ba1"
+                },
+                "amount": {
+                  "type": "integer",
+                  "description": "Amount of the water serving",
+                  "example": 500
+                },
+                "time": {
+                  "type": "string",
+                  "description": "The time when the serving was drinked",
+                  "example": "7:00"
+                }
+              }
             }
           }
         }
@@ -1118,7 +1111,7 @@
           "time": {
             "type": "string",
             "description": "The time when the serving was drinked",
-            "example": "11:00 AM"
+            "example": "13:00"
           }
         }
       },
@@ -1133,7 +1126,7 @@
           "time": {
             "type": "string",
             "description": "The time when the serving was drinked",
-            "example": "7:00 AM"
+            "example": "7:00"
           },
 
           "norma": {
