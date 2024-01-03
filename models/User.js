@@ -86,7 +86,6 @@ export const userSettingsSchema = Joi.object({
   name: Joi.string().min(3),
   email: Joi.string().pattern(emailRegexp),
   newPassword: Joi.string().min(8),
-
   gender: Joi.string().valid("mail", "femail"),
   avatar: Joi.string(),
 });

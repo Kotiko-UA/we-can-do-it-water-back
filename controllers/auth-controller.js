@@ -13,17 +13,13 @@ import cloudinary from "../helpers/cloudinary.js";
 const { JWT_SECRET, BASE_URL } = process.env;
 
 const signup = async (req, res) => {
-  const { email, password, repeatPassword } = req.body;
+  const { email, password } = req.body;
 
   const avatarURL = gravatar.url(email, { s: "100", r: "x", d: "retro" }, true);
-  if (password !== repeatPassword) {
-    throw HttpError(400, "Email or password is wrong");
-  }
   const user = await User.findOne({ email });
   if (user) {
     throw HttpError(409, "Email in use");
   }
-
   const hashPassword = await bcrypt.hash(password, 10);
   const verificationToken = nanoid();
   const newUser = await User.create({
