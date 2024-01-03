@@ -24,8 +24,8 @@ export const userShema = new Schema(
     },
     gender: {
       type: String,
-      enum: ["girl", "men"],
-      default: "girl",
+      enum: ["mail", "femail"],
+      default: "mail",
     },
     avatarURL: {
       type: String,
@@ -96,7 +96,7 @@ export const userSettingsSchema = Joi.object({
 
   newPassword: Joi.string().min(8),
 
-  gender: Joi.string().valid("girl", "men"),
+  gender: Joi.string().valid("mail", "femail"),
   avatar: Joi.string(),
 });
 
