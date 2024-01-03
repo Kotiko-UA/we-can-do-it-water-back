@@ -51,14 +51,14 @@ authRouter.patch(
   authController.settings
 );
 authRouter.patch(
-  "/updateDailyNorma",
+  "/dailynorma",
   isEmptyBody,
   authenticate,
   validaterBody(userDailyNormaUpdateSchema),
   authController.dailyNormaUpdate
 );
 authRouter.post(
-  "/forgetpassword",
+  "/forgotpassword",
   isEmptyBody,
   validaterBody(userEmailSchema),
   authController.forgetPassword

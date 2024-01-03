@@ -161,7 +161,7 @@ const settings = async (req, res) => {
       runValidators: true,
     }
   );
-  res.json(result);
+  res.json({ email, avatarURL, name, gender, dailyNorma });
 };
 
 const updateAvatar = async (req, res) => {

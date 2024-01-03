@@ -25,15 +25,15 @@ export const userShema = new Schema(
     gender: {
       type: String,
       enum: ["mail", "femail"],
-      default: "mail",
+      default: "femail",
     },
     avatarURL: {
       type: String,
       required: true,
     },
     dailyNorma: {
-      type: String,
-      default: "2.0",
+      type: Number,
+      default: "0",
     },
     token: {
       type: String,
@@ -65,10 +65,6 @@ export const userSignupSchema = Joi.object({
     "string.empty": `"Password" cannot be an empty field`,
     "any.required": `"Password" is a required field`,
   }),
-  repeatPassword: Joi.string().required().min(8).messages({
-    "string.empty": `"RepeatPassword" cannot be an empty field`,
-    "any.required": `"RepeatPassword" is a required field`,
-  }),
 });
 
 export const userSigninSchema = Joi.object({
@@ -89,11 +85,6 @@ export const userEmailSchema = Joi.object({
 export const userSettingsSchema = Joi.object({
   name: Joi.string().min(3),
   email: Joi.string().pattern(emailRegexp),
-
-  outdatedPasswword: Joi.string().min(8),
-
-  repeatNewPassword: Joi.string().min(8),
-
   newPassword: Joi.string().min(8),
 
   gender: Joi.string().valid("mail", "femail"),
