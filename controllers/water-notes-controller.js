@@ -79,18 +79,30 @@ const getByMonth = async (req, res) => {
   res.json(monthData);
 };
 const getOnToday = async (req, res) => {
-  const { _id: owner } = req.user;
+  const { _id: owner, dailyNorma } = req.user;
   const date = new Date();
   const month = date.getUTCMonth();
   const year = date.getUTCFullYear();
   const day = date.getDate();
+  const norma = dailyNorma ? Number(dailyNorma) : 2.0;
 
-  const result = await WaterNote.find({
+  const result = {
+    norma,
+    procent: 0,
+    notes: [],
+  };
+  const notes = await WaterNote.find({
     owner,
     createdAt: {
       $gte: new Date(year, month, day),
       $lt: new Date(year, month, day, 23, 59, 59),
     },
+  });
+  notes.forEach((note) => {
+    const { amount, time, _id } = note;
+
+    result.procent += Math.round((amount / (norma * 1000)) * 100);
+    result.notes.push({ amount, time, _id });
   });
   res.json(result);
 };
