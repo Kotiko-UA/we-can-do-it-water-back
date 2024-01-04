@@ -94,7 +94,7 @@ const signin = async (req, res) => {
   if (!user.verify) {
     throw HttpError(401, "Email or password is wrong");
   }
-  const passwordCompare = bcrypt.compare(password, user.password);
+  const passwordCompare = await bcrypt.compare(password, user.password);
 
   if (!passwordCompare) {
     throw HttpError(401, "Email or password is wrong");
@@ -138,16 +138,16 @@ const dailyNormaUpdate = async (req, res) => {
 };
 
 const settings = async (req, res) => {
-  const { email } = req.user;
+  let { password } = req.body;
+
+  const passwordCompare = await bcrypt.compare(password, req.user.password);
+  if (!passwordCompare) {
+    throw HttpError(400, "Password is wrong");
+  }
   const { newPassword } = req.body;
-  let { password } = req.user;
-
-  // const { error } = User.userSettingsSchema.validate(req.body);
-  // if (error) {
-  //   throw HttpError(404, error.message);
-  // }
-
-  password = newPassword ? await bcrypt.hash(newPassword, 10) : password;
+  password = newPassword
+    ? await bcrypt.hash(newPassword, 10)
+    : req.user.password;
 
   const result = await User.findOneAndUpdate(
     req.user._id,
@@ -157,6 +157,7 @@ const settings = async (req, res) => {
       runValidators: true,
     }
   );
+  const { email, avatarURL, name, gender, dailyNorma } = result;
   res.json({ email, avatarURL, name, gender, dailyNorma });
 };
 

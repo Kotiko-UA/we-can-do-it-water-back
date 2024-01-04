@@ -85,6 +85,10 @@ export const userEmailSchema = Joi.object({
 export const userSettingsSchema = Joi.object({
   name: Joi.string().min(3),
   email: Joi.string().pattern(emailRegexp),
+  password: Joi.string().required().messages({
+    "string.empty": `"Password" cannot be an empty field`,
+    "any.required": `"Password" is a required field`,
+  }),
   newPassword: Joi.string().min(8),
   gender: Joi.string().valid("mail", "femail"),
   avatar: Joi.string(),
