@@ -13,17 +13,13 @@ import cloudinary from "../helpers/cloudinary.js";
 const { JWT_SECRET, BASE_URL } = process.env;
 
 const signup = async (req, res) => {
-  const { email, password, repeatPassword } = req.body;
+  const { email, password } = req.body;
 
   const avatarURL = gravatar.url(email, { s: "100", r: "x", d: "retro" }, true);
-  if (password !== repeatPassword) {
-    throw HttpError(400, "Email or password is wrong");
-  }
   const user = await User.findOne({ email });
   if (user) {
     throw HttpError(409, "Email in use");
   }
-
   const hashPassword = await bcrypt.hash(password, 10);
   const verificationToken = nanoid();
   const newUser = await User.create({
@@ -36,7 +32,6 @@ const signup = async (req, res) => {
   res.status(201).json({
     email: newUser.email,
     avatarURL,
-    name: newUser.name,
   });
 
   const verifyEmail = {
@@ -89,7 +84,9 @@ const resendVerify = async (req, res) => {
 
 const signin = async (req, res) => {
   const { email, password } = req.body;
+
   const user = await User.findOne({ email });
+
   if (!user) {
     throw HttpError(401, "Email or password is wrong");
   }
@@ -97,8 +94,8 @@ const signin = async (req, res) => {
   if (!user.verify) {
     throw HttpError(401, "Email or password is wrong");
   }
+  const passwordCompare = bcrypt.compare(password, user.password);
 
-  const passwordCompare = await bcrypt.compare(password, user.password);
   if (!passwordCompare) {
     throw HttpError(401, "Email or password is wrong");
   }
@@ -111,7 +108,7 @@ const signin = async (req, res) => {
   await User.findByIdAndUpdate(user._id, { token });
   res.json({
     token,
-    user: { email: user.email },
+    user: { email: user.email, name: user.name, dailyNorma: user.dailyNorma },
     avatarURL,
   });
 };
@@ -151,7 +148,6 @@ const settings = async (req, res) => {
   // }
 
   password = newPassword ? await bcrypt.hash(newPassword, 10) : password;
-  console.log(password);
 
   const result = await User.findOneAndUpdate(
     req.user._id,
@@ -194,7 +190,7 @@ const forgetPassword = async (req, res) => {
     subject: "Recovery password",
     text: `Your new password ${recoveryPassword}`,
   };
-  console.log(recoveryPasswordMail);
+
   await sendEmail(recoveryPasswordMail);
 
   await User.findByIdAndUpdate(user._id, { password: recoveryPassword });
