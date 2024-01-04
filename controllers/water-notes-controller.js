@@ -66,8 +66,13 @@ const getByMonth = async (req, res) => {
         0
       ) + "%";
     const servings = consums.length;
+    const defaultNorma = req.user.dailyNorma
+      ? req.user.dailyNorma + " L"
+      : "2.0 L";
     const norma =
-      servings > 0 ? (consums[0].norma / 1000).toFixed(1) + " L" : "2.0 L";
+      servings > 0
+        ? (consums[servings - 1].norma / 1000).toFixed(1) + " L"
+        : defaultNorma;
     monthData.push({
       date,
       norma,

@@ -435,7 +435,7 @@
       }
     },
 
-    "/api/users/updateDailyNorma": {
+    "/api/users/dailynorma": {
       "patch": {
         "tags": ["User"],
         "summary": "Updating the user's daily water norm",
@@ -678,7 +678,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AddUpdateWaterNoteResponse"
+                  "$ref": "#/components/schemas/DeleteWaterNoteByIdResponse"
                 }
               }
             }
@@ -706,13 +706,8 @@
     "schemas": {
       "RegistrationRequest": {
         "type": "object",
-        "required": ["email", "password", "repeatPassword"],
+        "required": ["email", "password"],
         "properties": {
-          "name": {
-            "type": "string",
-            "description": "User's name",
-            "example": "User_1703626378604"
-          },
           "email": {
             "type": "string",
             "description": "User's email",
@@ -722,23 +717,12 @@
             "type": "string",
             "description": "User's password",
             "example": "qwerty123"
-          },
-          "repeatPassword": {
-            "type": "string",
-            "description": "User's password",
-            "example": "qwerty123"
           }
         }
       },
       "RegistrationResponse": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "description": "User's name",
-            "example": "User_1703626378604"
-          },
-
           "email": {
             "type": "string",
             "description": "User's email",
@@ -831,14 +815,18 @@
                 "type": "string",
                 "description": "User's email",
                 "format": "email"
+              },
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "User_1703626378604"
+              },
+              "dailyNorma": {
+                "type": "string",
+                "description": "User's daily norma",
+                "example": "1.5"
               }
             }
-          }
-        },
-        "example": {
-          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1OGIxOTBjYmQ0YmI4NmZmYTZkMDhmZCIsImlhdCI6MTcwMzYyMzcyOSwiZXhwIjoxNzAzNzEwMTI5fQ.BCv3G-n7eUMUhaUwFVvAzY10F29npram1P5CSy4LxDE",
-          "user": {
-            "email": "user@example.com"
           }
         }
       },
@@ -860,10 +848,10 @@
           "gender": {
             "type": "string",
             "description": "User's gender",
-            "enum": ["girl", "men"],
-            "default": "girl"
+            "enum": ["mail", "femail"],
+            "default": "femail"
           },
-          "outdatedPasswword": {
+          "password": {
             "type": "string",
             "description": "User's password",
             "example": "qwerty123"
@@ -872,25 +860,39 @@
             "type": "string",
             "description": "User's new password",
             "example": "123qwerty"
-          },
-
-          "repeatNewPassword": {
-            "type": "string",
-            "description": "Repeat user's new password",
-            "example": "123qwerty"
           }
         }
       },
       "SettingsResponse": {
         "type": "object",
         "properties": {
-          "message": {
+          "email": {
             "type": "string",
-            "description": "response message"
+            "description": "User's email",
+            "format": "email"
+          },
+          "avatarURL": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          },
+
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "User_1703614732940"
+          },
+          "gender": {
+            "type": "string",
+            "description": "User's gender",
+            "enum": ["mail", "femail"],
+            "default": "femail"
+          },
+          "dailyNorma": {
+            "type": "string",
+            "description": "User's daily norma",
+            "example": "1.5"
           }
-        },
-        "example": {
-          "message": "User saved successfully"
         }
       },
       "CurrentResponse": {
@@ -921,8 +923,8 @@
           "gender": {
             "type": "string",
             "description": "User's gender",
-            "enum": ["girl", "men"],
-            "default": "girl"
+            "enum": ["mail", "femail"],
+            "default": "femail"
           },
           "dailyNorma": {
             "type": "string",
