@@ -184,7 +184,8 @@ const forgetPassword = async (req, res) => {
   if (!user) {
     throw HttpError("404", "User not registered");
   }
-  const recoveryPassword = await bcrypt.hash(nanoid(), 10);
+  const recoveryPassword = nanoid();
+  const recoveryPasswordHash = await bcrypt.hash(recoveryPassword, 10);
 
   const recoveryPasswordMail = {
     to: email,
@@ -194,7 +195,7 @@ const forgetPassword = async (req, res) => {
 
   await sendEmail(recoveryPasswordMail);
 
-  await User.findByIdAndUpdate(user._id, { password: recoveryPassword });
+  await User.findByIdAndUpdate(user._id, { password: recoveryPasswordHash });
 
   res.status(200).json({
     message: "Password recovery ",
