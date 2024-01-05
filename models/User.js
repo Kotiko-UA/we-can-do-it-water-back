@@ -24,8 +24,8 @@ export const userShema = new Schema(
     },
     gender: {
       type: String,
-      enum: ["mail", "femail"],
-      default: "femail",
+      enum: ["male", "female"],
+      default: "female",
     },
     avatarURL: {
       type: String,
@@ -57,7 +57,7 @@ userShema.pre("findOneAndUpdate", preUpdate);
 userShema.post("findOneAndUpdate", handleSaveError);
 
 export const userSignupSchema = Joi.object({
-  name: Joi.string().min(3),
+  name: Joi.string().min(2),
   email: Joi.string().pattern(emailRegexp).required().messages({
     "any.required": `missing required name field`,
   }),
@@ -83,14 +83,14 @@ export const userEmailSchema = Joi.object({
   }),
 });
 export const userSettingsSchema = Joi.object({
-  name: Joi.string().min(3),
+  name: Joi.string().min(2),
   email: Joi.string().pattern(emailRegexp),
   password: Joi.string().required().messages({
     "string.empty": `"Password" cannot be an empty field`,
     "any.required": `"Password" is a required field`,
   }),
   newPassword: Joi.string().min(8),
-  gender: Joi.string().valid("mail", "femail"),
+  gender: Joi.string().valid("male", "female"),
   avatar: Joi.string(),
 });
 
