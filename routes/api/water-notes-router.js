@@ -12,7 +12,7 @@ const waterNotesRouter = express.Router();
 
 waterNotesRouter.use(authenticate);
 
-waterNotesRouter.get("/", waterNotesController.getByMonth);
+waterNotesRouter.get("/month", waterNotesController.getByMonth);
 waterNotesRouter.get("/today", waterNotesController.getOnToday);
 
 waterNotesRouter.post(
