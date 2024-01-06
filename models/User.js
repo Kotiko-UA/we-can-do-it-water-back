@@ -33,7 +33,7 @@ export const userShema = new Schema(
     },
     dailyNorma: {
       type: Number,
-      default: "0",
+      default: 2.0,
     },
     token: {
       type: String,
