@@ -6,7 +6,6 @@ import { ctrlWrapper } from "../decorators/index.js";
 import fs from "fs/promises";
 import path from "path";
 import gravatar from "gravatar";
-import Jimp from "jimp";
 import { nanoid } from "nanoid";
 import cloudinary from "../helpers/cloudinary.js";
 
@@ -167,8 +166,6 @@ const settings = async (req, res) => {
 };
 
 const updateAvatar = async (req, res) => {
-  console.log(req.file);
-
   if (!req.file) {
     throw HttpError(400, "No file");
   }
@@ -207,7 +204,7 @@ const forgetPassword = async (req, res) => {
   });
 };
 
-const recovery = async (req, res, next) => {
+const recovery = async (req, res) => {
   const { newPassword, repeatPassword, email } = req.body;
 
   const user = await User.findOne({ email });
@@ -215,9 +212,10 @@ const recovery = async (req, res, next) => {
     throw HttpError(404, "Email not found");
   }
 
-  if (user.email !== email || newPassword !== repeatPassword) {
-    throw HttpError("400", "Data not correct");
+  if (!user.verify) {
+    throw HttpError(401, "Email is wrong");
   }
+
   const hashpassword = await bcrypt.hash(newPassword, 10);
 
   await User.findByIdAndUpdate(user._id, { password: hashpassword });
