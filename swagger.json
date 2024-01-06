@@ -356,7 +356,7 @@
         }
       }
     },
-    "/api/users/forgetpassword": {
+    "/api/users/forgotpassword": {
       "post": {
         "tags": ["User"],
         "summary": "Request to get email for password recovery",
@@ -367,7 +367,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ForgetPasswordRequest"
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
               }
             }
           }
@@ -378,7 +378,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ForgetPasswordResponse"
+                  "$ref": "#/components/schemas/ForgotPasswordResponse"
                 }
               }
             }
@@ -480,8 +480,53 @@
         }
       }
     },
-
     "/api/waternotes": {
+      "post": {
+        "tags": ["WaterNote"],
+        "summary": "Add the water note to the base",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Add the water note object ",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddUpdateWaterNoteRequest"
+              }
+            }
+          }
+        },
+
+        "responses": {
+          "201": {
+            "description": "The water note created to the base",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddUpdateWaterNoteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+          "401": {
+            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error401UnathorizedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/waternotes/month": {
       "get": {
         "tags": ["WaterNote"],
         "summary": "Get the water notes by month of year for logged in user",
@@ -511,50 +556,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WaterNotesByMonthResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (invalid request body)",
-            "content": {}
-          },
-          "401": {
-            "description": "Bearer auth failed - Якщо запит не містить дійсний токен або токен вже вичерпав свій термін дії, сервер поверне відповідь з кодом статусу HTTP 401 Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/error401UnathorizedResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": ["WaterNote"],
-        "summary": "Add the water note to the base",
-        "parameters": [],
-        "security": [{ "Bearer": [] }],
-        "requestBody": {
-          "description": "Add the water note object ",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddUpdateWaterNoteRequest"
-              }
-            }
-          }
-        },
-
-        "responses": {
-          "201": {
-            "description": "The water note created to the base",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AddUpdateWaterNoteResponse"
                 }
               }
             }
@@ -822,11 +823,22 @@
                 "example": "User_1703626378604"
               },
               "dailyNorma": {
-                "type": "string",
+                "type": "number",
                 "description": "User's daily norma",
-                "example": "1.5"
+                "example": 1.8
+              },
+              "gender": {
+                "type": "string",
+                "description": "User's gender",
+                "enum": ["male", "female"],
+                "default": "female"
               }
             }
+          },
+          "avatarURL": {
+            "type": "string",
+            "description": "User's avatar URL",
+            "example": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro"
           }
         }
       },
@@ -848,8 +860,8 @@
           "gender": {
             "type": "string",
             "description": "User's gender",
-            "enum": ["mail", "femail"],
-            "default": "femail"
+            "enum": ["male", "female"],
+            "default": "female"
           },
           "password": {
             "type": "string",
@@ -873,8 +885,8 @@
           },
           "avatarURL": {
             "type": "string",
-            "description": "User's password",
-            "example": "qwerty123"
+            "description": "User's avatar URL",
+            "example": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro"
           },
 
           "name": {
@@ -885,13 +897,13 @@
           "gender": {
             "type": "string",
             "description": "User's gender",
-            "enum": ["mail", "femail"],
-            "default": "femail"
+            "enum": ["male", "female"],
+            "default": "female"
           },
           "dailyNorma": {
-            "type": "string",
+            "type": "number",
             "description": "User's daily norma",
-            "example": "1.5"
+            "example": 1.8
           }
         }
       },
@@ -905,8 +917,8 @@
           },
           "avatarURL": {
             "type": "string",
-            "description": "User's password",
-            "example": "qwerty123"
+            "description": "User's avatar URL",
+            "example": "https://s.gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af?s=100&r=x&d=retro"
           },
 
           "_id": {
@@ -923,13 +935,13 @@
           "gender": {
             "type": "string",
             "description": "User's gender",
-            "enum": ["mail", "femail"],
-            "default": "femail"
+            "enum": ["male", "female"],
+            "default": "female"
           },
           "dailyNorma": {
-            "type": "string",
+            "type": "number",
             "description": "User's daily norma",
-            "example": "1.5"
+            "example": 1.8
           }
         }
       },
@@ -955,7 +967,7 @@
           "avatarURL": "http://res.cloudinary.com/dwvqwgluc/image/upload/v1703718970/avatars/un0ikbqelunwoywbduis.jpg"
         }
       },
-      "ForgetPasswordRequest": {
+      "ForgotPasswordRequest": {
         "type": "object",
         "required": ["email"],
         "properties": {
@@ -966,7 +978,7 @@
           }
         }
       },
-      "ForgetPasswordResponse": {
+      "ForgotPasswordResponse": {
         "type": "object",
         "properties": {
           "message": {
