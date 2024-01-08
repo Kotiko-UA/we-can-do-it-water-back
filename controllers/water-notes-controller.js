@@ -59,23 +59,19 @@ const getByMonth = async (req, res) => {
         .toISOString()
         .includes(`${year}-${mon}-${String(day).padStart(2, "0")}`);
     });
+    const servings = consums.length;
+    const defaultNorma = req.user.dailyNorma ? req.user.dailyNorma : 2.0;
+    const norma =
+      servings > 0 ? consums[servings - 1].norma / 1000 : defaultNorma;
     const date = `${day}, ${months[month - 1]}`;
     const procent =
-      consums.reduce(
-        (acc, curr) => acc + Math.round((curr.amount / curr.norma) * 100),
-        0
+      Math.round(
+        consums.reduce((acc, curr) => acc + (curr.amount / curr.norma) * 100, 0)
       ) + "%";
-    const servings = consums.length;
-    const defaultNorma = req.user.dailyNorma
-      ? req.user.dailyNorma + " L"
-      : "2.0 L";
-    const norma =
-      servings > 0
-        ? (consums[servings - 1].norma / 1000).toFixed(1) + " L"
-        : defaultNorma;
+
     monthData.push({
       date,
-      norma,
+      norma: norma.toFixed(1) + " L",
       procent,
       servings,
     });
@@ -103,12 +99,14 @@ const getOnToday = async (req, res) => {
       $lt: new Date(year, month, day, 23, 59, 59),
     },
   });
+  let procent = 0;
   notes.forEach((note) => {
     const { amount, time, _id } = note;
 
-    result.procent += Math.round((amount / (norma * 1000)) * 100);
+    procent += (amount / (norma * 1000)) * 100;
     result.notes.push({ amount, time, _id });
   });
+  result.procent += Math.round(procent);
   res.json(result);
 };
 const getById = async (req, res) => {
