@@ -8,6 +8,7 @@ import path from "path";
 import gravatar from "gravatar";
 import { nanoid } from "nanoid";
 import cloudinary from "../helpers/cloudinary.js";
+import WaterNote from "../models/WaterNote.js";
 
 const { JWT_SECRET, BASE_URL } = process.env;
 
@@ -136,6 +137,20 @@ const dailyNormaUpdate = async (req, res) => {
     throw HttpError(400, "Enter your dailyNorma");
   }
   await User.findByIdAndUpdate(_id, req.body);
+  const date = new Date();
+  const month = date.getUTCMonth();
+  const year = date.getUTCFullYear();
+  const day = date.getDate();
+  await WaterNote.updateMany(
+    {
+      owner: _id,
+      createdAt: {
+        $gte: new Date(year, month, day),
+        $lt: new Date(year, month, day, 23, 59, 59),
+      },
+    },
+    { norma: dailyNorma * 1000 }
+  );
   res.json({
     dailyNorma,
   });
