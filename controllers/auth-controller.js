@@ -57,9 +57,6 @@ const verify = async (req, res) => {
     verificationToken: null,
   });
   res.redirect('https://kotiko-ua.github.io/we-can-do-it-water-front/signin');
-  // res.json({
-  //   message: "Verification successful",
-  // });
 };
 
 const resendVerify = async (req, res) => {
